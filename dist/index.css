@@ -1,0 +1,185 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#content {
+    height: inherit;
+    font-family: 'Mukta', sans-serif;
+    color: #343434;
+}
+
+#main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #002147;
+}
+
+#main-header a {
+    text-decoration: none;
+    color: white;
+}
+
+#logo {
+    padding-left: 50px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.65rem;
+}
+
+ul {
+    padding-right: 50px;
+    list-style: none;
+    font-family: 'Dosis', sans-serif;
+    font-size: .96rem;
+}
+
+li {
+    display: inline;
+    padding-left: 3rem;
+}
+
+aside {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: inherit;
+    width: 250px;
+    margin-top: 50px;
+    display: grid;
+    grid-template-rows: 10% 80% 10%;
+    background-color: #dcdcdc;
+}
+
+button {
+    font-family: 'Mukta', sans-serif;
+    font-size: .95rem;
+}
+
+button:focus {
+    outline: 0;
+}
+
+#new-proj-btn {
+    width: 85%;
+    height: 40px;
+    border: none;
+    align-self: center;
+    justify-self: center;
+    background-color: #6082b6;
+    color: white;
+}
+
+.proj {
+    box-sizing: border-box;
+    width: 85%;
+    height: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 10px;
+    border-left: 5px solid #ffa500;
+    background-color: #fffacd;
+    display: grid;
+    grid-template-columns: 7fr 1fr 1fr 1fr;
+    align-items: center;
+    grid-gap: 7px;
+}
+
+.proj button {
+    border: none;
+    padding: 0;
+    background: none;
+}
+
+.proj .fas, .task-info .fas {
+    color: lightgrey;
+}
+
+.task-amt {
+    text-align: center;
+}
+
+footer {
+    text-align: center;
+    background-color: #002147;
+}
+
+footer a {
+    font-size: .9rem;
+    text-decoration: none;
+    color: white;
+}
+
+main {
+    padding: 80px 150px 30px 400px;
+}
+
+#active-page-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+#active-page-header span {
+    font-size: 2rem;
+}
+
+#active-page-header button {
+    height: 35px;
+    border: none;
+    border-radius: 3px;
+    align-self: center;
+    background-color: #ffa500;
+}
+
+.task-info {
+    display: grid;
+    grid-template-columns: 1fr 11fr 1fr 1fr 1fr;
+    align-items: center;
+    border-bottom: 1px solid lightgrey;
+}
+
+.task-info input {
+    margin: 10px;
+}
+
+.task-info div {
+    display: flex;
+    flex-direction: column;
+}
+
+.task-info button {
+    border: none;
+    padding: 0;
+    background: none;
+}
+
+.due-date {
+    font-size: .8rem;
+    color: grey;
+}
+
+.task-note {
+    display: grid;
+    grid-template-columns: 1fr 11fr 1fr 1fr 1fr;
+    min-height: 100px;
+    border-right: 1px solid lightgrey;
+    border-left: 1px solid lightgrey;
+    border-bottom: 1px solid lightgrey;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.task-note span {
+    padding-top: 10px;
+}
+
+.task-note span:first-of-type {
+    padding-left: 10px;
+}
