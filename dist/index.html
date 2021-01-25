@@ -11,13 +11,13 @@
     </head>
     <body>
         <div id="content">
-            <header id="main-header">
+            <!-- <header id="main-header">
                 <a href="#" id="logo">
                     <span><i class="fas fa-list-alt"></i> My Plans</span>
                 </a>
                 <nav>
                     <ul id="nav-links">
-                        <li><a href="#">Today</a></li>
+                        <li><a href="#" class="nav-link">Today</a></li>
                         <li><a href="#">Tomorrow</a></li>
                         <li><a href="#">This Week</a></li>
                         <li><a href="#">Next Week</a></li>
@@ -29,7 +29,7 @@
                 <button type="button" id="new-proj-btn">New Project</button>
                 <div id="proj-list">
                     <div class="proj">
-                        <span>Cook</span>
+                        <span class="proj-name">Cook</span>
                         <span class="task-amt">9</span>
                         <button><i class="fas fa-pen"></i></button>
                         <button><i class="fas fa-trash"></i></button>
@@ -37,28 +37,89 @@
                 </div>
                 <footer><a href="https://www.codesweetly.com/" target="_blank">Created by Oluwatobi Sofela <i class="fas fa-arrow-alt-circle-right"></i></a></footer>
             </aside>
-            <main>
+            <main id="main-ele">
                 <header id="active-page-header">
-                    <span>Cook</span>
+                    <span id="active-page-title">Cook</span>
                     <button>Add New Task</button>
                 </header>
-                <div class="task">
-                    <section class="task-info">
-                        <input type="checkbox">
-                        <div>
-                            <span>Rice</span>
-                            <span class="due-date">Due: Fri 24 May . 4 months time</span>
-                        </div>
-                        <button><i class="fas fa-star"></i></button>
-                        <button><i class="fas fa-pen"></i></button>
-                        <button><i class="fas fa-trash"></i></button>
-                    </section>
-                    <section class="task-note">
-                        <span><strong>Note:</strong></span>
-                        <span>Brainstorm what kind of properties your todo-items are going to have. At a minimum they should have a title, description, dueDate and priority. You might also want to include notes or even a checklist.</span>
-                    </section>
+                <div id="active-page-body">
+                    <div class="task-card">
+                        <section class="task-info">
+                            <input type="checkbox" class="task-done-chkbox">
+                            <div class="task-and-due-date">
+                                <span class="task">Rice</span>
+                                <span class="due-date">Due: Fri 24 May . 4 months time</span>
+                            </div>
+                            <button><i class="fas fa-star"></i></button>
+                            <button><i class="fas fa-pen"></i></button>
+                            <button><i class="fas fa-trash"></i></button>
+                        </section>
+                        <section class="task-note">
+                            <span class="note-header"><strong>Note:</strong></span>
+                            <span class="note-body">Brainstorm what kind of properties your todo-items are going to have. At a minimum they should have a title, description, dueDate and priority. You might also want to include notes or even a checklist.</span>
+                        </section>
+                    </div>
                 </div>
             </main>
+            <section id="new-proj-modal-bg" class="modal-bg">
+                <div id="new-proj-modal-box" class="modal-box">
+                    <header>
+                        <span>New Project</span>
+                        <span id="close-proj-modal" class="close-modal">x</span>
+                    </header>
+                    <div class="modal-box-body">
+                        <form id="new-proj-form">
+                            <label for="proj-title">Name</label>
+                            <input type="text" id="proj-title">
+                            <div id="new-proj-modal-btns">
+                                <button type="button" id="cancel-proj-btn" class="modal-btn cancel-btn">Cancel</button>
+                                <button type="button" id="create-proj-btn" class="modal-btn create-btn">Create Project</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+            <section id="new-task-modal-bg" class="modal-bg">
+                <div id="new-task-modal-box" class="modal-box">
+                    <header>
+                        <span>New Task</span>
+                        <span id="close-task-modal" class="close-modal">x</span>
+                    </header>
+                    <div class="modal-box-body">
+                        <form id="new-task-form">
+                            <div id="task">
+                                <label for="task-title">Task</label>
+                                <input type="text" id="task-title">
+                            </div>
+                            <div id="note">
+                                <label for="task-note">Note</label>
+                                <textarea id="task-note"></textarea>
+                            </div>
+                            <div id="due-date">
+                                <label for="task-date">Due date</label>
+                                <input type="date" id="task-date">
+                            </div>
+                            <div id="importance">
+                                <label>
+                                    <span>Mark as important</span>
+                                    <input type="checkbox" id="task-importance">
+                                </label>
+                            </div>
+                            <div>
+                                <label for="proj-dropdown">Add to project</label>
+                                <select id="proj-dropdown">
+                                    <option>Random</option>
+                                </select>
+                            </div>
+                            <div class="modal-btns-div">
+                                <button type="button" id="cancel-task-btn" class="modal-btn cancel-btn">Cancel</button>
+                                <button type="button" id="create-new-task-btn" class="modal-btn create-btn">Add Task</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section> -->
         </div>
+        <script src="main.js"></script>
     </body>
 </html>
