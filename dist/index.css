@@ -176,7 +176,7 @@ main {
 
 .task-note {
     display: none;
-    grid-template-columns: 1fr 11fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 11fr 3fr;
     min-height: 100px;
     border-right: 1px solid lightgrey;
     border-left: 1px solid lightgrey;
