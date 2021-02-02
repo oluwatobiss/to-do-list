@@ -1,4 +1,7 @@
-import {shared, header, aside, mainEle, newProjModal, newTaskModal} from "./aggregator.js";
+import {
+    shared, header, aside, mainEle, newProjModal, newTaskModal, isToday, isTomorrow,
+    isThisWeek, startOfWeek, addDays, isSameWeek, formatDistance, parseISO
+} from "./aggregator.js";
 
 const contentDiv = document.getElementById("content");
 contentDiv.append(header, aside, mainEle, newProjModal, newTaskModal);
@@ -27,6 +30,11 @@ const modalBoxTaskImportance = document.getElementById("task-importance");
 const projDropDown = document.getElementById("proj-dropdown");
 const cancelTaskBtn = document.getElementById("cancel-task-btn");
 const addTaskBtn = document.getElementById("add-task-btn");
+
+const todaysDate = new Date();
+const startOfTodaysWeek = startOfWeek(todaysDate);
+const startOfNextWeek = addDays(startOfTodaysWeek, 7);
+console.log(startOfNextWeek);
 
 const projsAndTasks = {
     Important: [], 
@@ -92,7 +100,7 @@ function closeModal(objClicked) {
 
 function displayNavName(event) {
     let clickedNavLink = null;
-    if (event === "windowLoaded") {
+    if (event === "windowLoaded" || event === "projDeleted") {
         clickedNavLink = "Today";
     } else {
         clickedNavLink = this.querySelector(".nav-link").innerText;
@@ -109,12 +117,61 @@ function displayNavName(event) {
 
         for (const prop in projsAndTasks) {
             if (prop !== "Important") {
-                // projsAndTasks[prop].forEach(i => createTask(i));
-                projsAndTasks[prop].forEach(i => {
-                    console.log(projsAndTasks[prop]);
-                    console.log(i);
-                    console.log(i.dueDate);
-                });
+                projsAndTasks[prop].forEach(showTodaysTask);
+
+                function showTodaysTask(task) {
+                    if (isToday(parseISO(task.dueDate))) {
+                        createTask(task);
+                    }
+                }
+            }
+        }
+    }
+
+    if (clickedNavLink === "Tomorrow") {
+        console.log("This is the space for Tomorrow's tasks");
+
+        for (const prop in projsAndTasks) {
+            if (prop !== "Important") {
+                projsAndTasks[prop].forEach(showTomorrowsTask);
+
+                function showTomorrowsTask(task) {
+                    if (isTomorrow(parseISO(task.dueDate))) {
+                        createTask(task);
+                    }
+                }
+            }
+        }
+    }
+
+    if (clickedNavLink === "This Week") {
+        console.log("This is the space for This Week's tasks");
+
+        for (const prop in projsAndTasks) {
+            if (prop !== "Important") {
+                projsAndTasks[prop].forEach(showThisWeeksTask);
+
+                function showThisWeeksTask(task) {
+                    if (isThisWeek(parseISO(task.dueDate))) {
+                        createTask(task);
+                    }
+                }
+            }
+        }
+    }
+
+    if (clickedNavLink === "Next Week") {
+        console.log("This is the space for Next Week's tasks");
+
+        for (const prop in projsAndTasks) {
+            if (prop !== "Important") {
+                projsAndTasks[prop].forEach(showNextWeeksTask);
+
+                function showNextWeeksTask(task) {
+                    if (isSameWeek(parseISO(task.dueDate), startOfNextWeek)) {
+                        createTask(task);
+                    }
+                }
             }
         }
     }
@@ -233,9 +290,15 @@ function addTask() {
                     
                     document.querySelector(`.${projNameConvert}-task-amt`).innerText = projsAndTasks[prop].length;
                     
-                    if (activePgTitle.innerText === "All Tasks" ||
+                    if (
+                        (activePgTitle.innerText === "Today" && isToday(parseISO(taskInfo.dueDate))) ||
+                        (activePgTitle.innerText === "Tomorrow" && isTomorrow(parseISO(taskInfo.dueDate))) ||
+                        (activePgTitle.innerText === "This Week" && isThisWeek(parseISO(taskInfo.dueDate))) ||
+                        (activePgTitle.innerText === "Next Week" && isSameWeek(parseISO(taskInfo.dueDate), startOfNextWeek)) ||
+                        activePgTitle.innerText === "All Tasks" ||
                         activePgTitle.innerText === projDropDown.value ||
-                        (activePgTitle.innerText === "Important" && taskInfo.important)) {
+                        (activePgTitle.innerText === "Important" && taskInfo.important)
+                        ) {
                         createTask(taskInfo);
                     }
                 }
@@ -329,10 +392,28 @@ function addTask() {
                             activePgBody.firstChild.remove();
                         }
     
-                        if (activePgTitle.innerText === "All Tasks") {
+                        if (
+                            activePgTitle.innerText === "Today" ||
+                            activePgTitle.innerText === "Tomorrow" ||
+                            activePgTitle.innerText === "This Week" ||
+                            activePgTitle.innerText === "Next Week" ||
+                            activePgTitle.innerText === "All Tasks"
+                            ) {
                             for (const prop in projsAndTasks) {
                                 if (prop !== "Important") {
-                                    projsAndTasks[prop].forEach(i => createTask(i));
+                                    projsAndTasks[prop].forEach(createTaskBasedOnNavClicked);
+
+                                    function createTaskBasedOnNavClicked(currItem) {
+                                        if (
+                                            (activePgTitle.innerText === "Today" && isToday(parseISO(currItem.dueDate))) ||
+                                            (activePgTitle.innerText === "Tomorrow" && isTomorrow(parseISO(currItem.dueDate))) ||
+                                            (activePgTitle.innerText === "This Week" && isThisWeek(parseISO(currItem.dueDate))) ||
+                                            (activePgTitle.innerText === "Next Week" && isSameWeek(parseISO(currItem.dueDate), startOfNextWeek)) ||
+                                            activePgTitle.innerText === "All Tasks"
+                                            ) {
+                                            createTask(currItem);
+                                        }
+                                    }
                                 }
                             }
                         } else {
@@ -355,6 +436,7 @@ function createTask(taskInfoObj) {
     const taskSpan = shared.createElement("span", [taskInfoObj.task]);
     const taskConvert = taskInfoObj.task.toLowerCase().replace(/\W/g, "-");
     const taskDoneInputEle = shared.createElement("input", null, {type: "checkbox", class: "task-done-chkbox", task: taskConvert});
+    const dueDateInWords = new Date(taskInfoObj.dueDate).toDateString();
 
     if (taskInfoObj.taskDone) {
         taskDoneInputEle.checked = true;
@@ -364,7 +446,11 @@ function createTask(taskInfoObj) {
         taskSpan.classList.add("task");
     }
 
-    const dueDateSpan = shared.createElement("span", [taskInfoObj.dueDate], {class: "due-date"});
+    const dueDateSpan = shared.createElement(
+        "span",
+        [`Due: ${dueDateInWords} • ${formatDistance(parseISO(taskInfoObj.dueDate), todaysDate, {addSuffix: true})}`],
+        {class: "due-date"}
+        );
     const taskAndDateDiv = shared.createElement("div", [taskSpan, dueDateSpan], {class: "task-and-due-date", task: taskConvert});
 
     const starIcon = document.createElement("i");
@@ -440,9 +526,26 @@ function actOnProjEle(objClicked) {
             if (trashProjBtn.getAttribute("proj") === projNameConvert) {
                 const clickedProjCard = projCards[i];
                 const clickedProjName = clickedProjCard.querySelector(".proj-name").innerText;
+                projsAndTasks[clickedProjName].forEach(checkIfTaskIsImp);
+                console.log(`#${projNameConvert}`);
+                projDropDown.querySelector(`#${projNameConvert}-proj-opt`).remove();
                 delete projsAndTasks[clickedProjName];
                 clickedProjCard.remove();
-                displayTodayTasks();
+                displayNavName("projDeleted");
+
+                function checkIfTaskIsImp(currItem) {
+                    if (currItem.important) {
+                        const tasksProjName = currItem.taskProj;
+                        const taskTitle = currItem.task;
+                        projsAndTasks.Important.forEach(delTaskFromImpProj);
+                        function delTaskFromImpProj(currItem, currItemInd) {
+                            if (currItem.taskProj === tasksProjName && currItem.task === taskTitle) {
+                                projsAndTasks.Important.splice(currItemInd, 1);
+                                document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -465,12 +568,29 @@ function actOnTaskEle(objClicked) {
                 clickedTaskCardIndex = i;
             }
         }
+        const clickedTaskCard = taskCards[clickedTaskCardIndex];
+        const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskProj");
+        const clickedTaskTitle = clickedTaskCard.querySelector(".task").innerText;
+
         const clickedCardTask = activePgBody.children[clickedTaskCardIndex].querySelector(".task");
         clickedCardTask.classList.toggle("task-done");
+
         if (taskDoneChkBox.checked) {
-            projsAndTasks[activePgTitle.innerText][clickedTaskCardIndex].taskDone = true;
+            projsAndTasks[clickedTaskProjName].forEach(changeTaskDoneToTrue);
+
+            function changeTaskDoneToTrue(currItem, currItemInd) {
+                if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
+                    projsAndTasks[clickedTaskProjName][currItemInd].taskDone = true;
+                }
+            }
         } else {
-            projsAndTasks[activePgTitle.innerText][clickedTaskCardIndex].taskDone = false;
+            projsAndTasks[clickedTaskProjName].forEach(changeTaskDoneToFalse);
+
+            function changeTaskDoneToFalse(currItem, currItemInd) {
+                if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
+                    projsAndTasks[clickedTaskProjName][currItemInd].taskDone = false;
+                }
+            }
         }
     }
 
@@ -540,7 +660,13 @@ function actOnTaskEle(objClicked) {
         }
 
         if (activePgTitle.innerText !== "Important") {
-            if (activePgTitle.innerText === "All Tasks") {
+            if (
+                activePgTitle.innerText === "Today" ||
+                activePgTitle.innerText === "Tomorrow" ||
+                activePgTitle.innerText === "This Week" ||
+                activePgTitle.innerText === "Next Week" ||
+                activePgTitle.innerText === "All Tasks"
+                ) {
                 projsAndTasks[clickedTaskProjName].forEach(changeTaskImportance);
 
                 function changeTaskImportance(currItem, currItemInd) {
@@ -597,9 +723,14 @@ function actOnTaskEle(objClicked) {
         taskModalHeader.innerText = "Edit Task";
         addTaskBtn.innerText = "Update Task";
 
-        if (activePgTitle.innerText === "All Tasks") {
+        if (
+            activePgTitle.innerText === "Today" ||
+            activePgTitle.innerText === "Tomorrow" ||
+            activePgTitle.innerText === "This Week" ||
+            activePgTitle.innerText === "Next Week" ||
+            activePgTitle.innerText === "All Tasks"
+            ) {
             projsAndTasks[clickedTaskProjName].forEach(preFillModalBox);
-
             function preFillModalBox(currItem) {
                 if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
                     modalBoxTaskTitle.value = currItem.task;
@@ -639,7 +770,13 @@ function actOnTaskEle(objClicked) {
         console.log(projsAndTasks[clickedTaskProjName]);
 
         if (activePgTitle.innerText !== "Important") {
-            if (activePgTitle.innerText === "All Tasks") {
+            if (
+                activePgTitle.innerText === "Today" ||
+                activePgTitle.innerText === "Tomorrow" ||
+                activePgTitle.innerText === "This Week" ||
+                activePgTitle.innerText === "Next Week" ||
+                activePgTitle.innerText === "All Tasks"
+                ) {
                 for (let i = 0; i < projsAndTasks[clickedTaskProjName].length; i++) {
                     const currItem = projsAndTasks[clickedTaskProjName][i];
                     if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
@@ -676,16 +813,34 @@ function actOnTaskEle(objClicked) {
 
         if (activePgTitle.innerText === "Important") {
             projsAndTasks.Important.forEach(i => createTask(i));
-        } else if (activePgTitle.innerText === "All Tasks") {
-            for (const prop in projsAndTasks) {
-                if (prop !== "Important") {
-                    projsAndTasks[prop].forEach(i => createTask(i));
+        } else if (
+            activePgTitle.innerText === "Today" ||
+            activePgTitle.innerText === "Tomorrow" ||
+            activePgTitle.innerText === "This Week" ||
+            activePgTitle.innerText === "Next Week" ||
+            activePgTitle.innerText === "All Tasks"
+            ) {
+                for (const prop in projsAndTasks) {
+                    if (prop !== "Important") {
+                        projsAndTasks[prop].forEach(createTaskBasedOnNavClicked);
+
+                        function createTaskBasedOnNavClicked(currItem) {
+                            if (
+                                (activePgTitle.innerText === "Today" && isToday(parseISO(currItem.dueDate))) ||
+                                (activePgTitle.innerText === "Tomorrow" && isTomorrow(parseISO(currItem.dueDate))) ||
+                                (activePgTitle.innerText === "This Week" && isThisWeek(parseISO(currItem.dueDate))) ||
+                                (activePgTitle.innerText === "Next Week" && isSameWeek(parseISO(currItem.dueDate), startOfNextWeek)) ||
+                                activePgTitle.innerText === "All Tasks"
+                                ) {
+                                createTask(currItem);
+                            }
+                        }
+                    }
                 }
-            }
         } else {
             projsAndTasks[clickedTaskProjName].forEach(i => createTask(i));
         }
-
+            
         function delTaskFromImpProj(currItem, currItemInd) {
             if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
                 projsAndTasks.Important.splice(currItemInd, 1);

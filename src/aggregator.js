@@ -5,3 +5,4 @@ export {default as mainEle} from "./main-ele.js";
 export {default as aside} from "./aside.js";
 export {default as newProjModal} from "./new-proj-modal.js";
 export {default as newTaskModal} from "./new-task-modal";
+export {isToday, isTomorrow, isThisWeek, startOfWeek, addDays, isSameWeek, formatDistance, parseISO} from "date-fns";
