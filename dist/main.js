@@ -2224,6 +2224,7 @@ __webpack_require__.r(__webpack_exports__);
 const contentDiv = document.getElementById("content");
 contentDiv.append(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.header, _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.aside, _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.mainEle, _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.newProjModal, _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.newTaskModal);
 
+const logo = document.getElementById("logo");
 const navLinks = Array.from(document.querySelector("#nav-links").children);
 const asideEleNode = document.getElementById("aside-ele");
 const projListDiv = document.getElementById("proj-list");
@@ -2262,13 +2263,13 @@ const projsAndTasks = {
 const defaultProjs = (() => {
     for (const prop in projsAndTasks) {
         if (prop === "Important" || prop === "Random") {
+            const projNameConvert = prop.toLowerCase().replace(/\W/g, "-");
             const projNameSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [prop], {class: "proj-name"});
     
             const taskAmtSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [projsAndTasks[prop].length]);
-            const projNameConvert = prop.toLowerCase().replace(/\W/g, "-");
             taskAmtSpan.classList.add("task-amt", `${projNameConvert}-task-amt`);
             
-            const projDiv = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("div", [projNameSpan, taskAmtSpan], {class: "proj"});
+            const projDiv = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("div", [projNameSpan, taskAmtSpan], {class: "proj", proj: projNameConvert});
             projDiv.addEventListener("click", displayProj);
             projListDiv.append(projDiv);
 
@@ -2285,6 +2286,7 @@ let clickedTaskCardIndex = null;
 
 window.addEventListener("click", closeModal);
 window.addEventListener("load", () => displayNavName("windowLoaded"));
+logo.addEventListener("click", () => displayNavName("logoClicked"))
 navLinks.forEach(i => i.addEventListener("click", displayNavName));
 createProjBtn.addEventListener("click", addProjName);
 addTaskBtn.addEventListener("click", addTask);
@@ -2317,8 +2319,16 @@ function closeModal(objClicked) {
 }
 
 function displayNavName(event) {
+    navLinks.forEach(i => {
+        i.children[0].classList.remove("active-nav");
+    });
+
+    for (let i = 0; i < projCards.length; i++) {
+        projCards[i].classList.remove("active-proj");
+    }
+
     let clickedNavLink = null;
-    if (event === "windowLoaded" || event === "projDeleted") {
+    if (event === "windowLoaded" || event === "logoClicked" || event === "projDeleted") {
         clickedNavLink = "Today";
     } else {
         clickedNavLink = this.querySelector(".nav-link").innerText;
@@ -2331,8 +2341,7 @@ function displayNavName(event) {
     }
 
     if (clickedNavLink === "Today") {
-        console.log("This is the space for Today's tasks");
-
+        navLinks[0].children[0].classList.add("active-nav");
         for (const prop in projsAndTasks) {
             if (prop !== "Important") {
                 projsAndTasks[prop].forEach(showTodaysTask);
@@ -2347,8 +2356,7 @@ function displayNavName(event) {
     }
 
     if (clickedNavLink === "Tomorrow") {
-        console.log("This is the space for Tomorrow's tasks");
-
+        navLinks[1].children[0].classList.add("active-nav");
         for (const prop in projsAndTasks) {
             if (prop !== "Important") {
                 projsAndTasks[prop].forEach(showTomorrowsTask);
@@ -2363,8 +2371,7 @@ function displayNavName(event) {
     }
 
     if (clickedNavLink === "This Week") {
-        console.log("This is the space for This Week's tasks");
-
+        navLinks[2].children[0].classList.add("active-nav");
         for (const prop in projsAndTasks) {
             if (prop !== "Important") {
                 projsAndTasks[prop].forEach(showThisWeeksTask);
@@ -2379,8 +2386,7 @@ function displayNavName(event) {
     }
 
     if (clickedNavLink === "Next Week") {
-        console.log("This is the space for Next Week's tasks");
-
+        navLinks[3].children[0].classList.add("active-nav");
         for (const prop in projsAndTasks) {
             if (prop !== "Important") {
                 projsAndTasks[prop].forEach(showNextWeeksTask);
@@ -2395,8 +2401,7 @@ function displayNavName(event) {
     }
 
     if (clickedNavLink === "All Tasks") {
-        console.log("This is the space for all tasks");
-
+        navLinks[4].children[0].classList.add("active-nav");
         for (const prop in projsAndTasks) {
             if (prop !== "Important") {
                 projsAndTasks[prop].forEach(i => createTask(i));
@@ -2453,10 +2458,10 @@ function addProjName() {
 }
 
 function createProj(projName) {
+    const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
     const projNameSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [projName], {class: "proj-name"});
 
     const taskAmtSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [projsAndTasks[projName].length]);
-    const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
     taskAmtSpan.classList.add("task-amt", `${projNameConvert}-task-amt`);
 
     const editIcon = document.createElement("i");
@@ -2467,7 +2472,7 @@ function createProj(projName) {
     deleteIcon.classList.add("fas", "fa-trash");
     const deleteBtn = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("button", [deleteIcon], {class: "trash-proj-btn", proj: projNameConvert});
     
-    const projDiv = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("div", [projNameSpan, taskAmtSpan, editBtn, deleteBtn], {class: "proj"});
+    const projDiv = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("div", [projNameSpan, taskAmtSpan, editBtn, deleteBtn], {class: "proj", proj: projNameConvert});
     projDiv.addEventListener("click", displayProj);
     projListDiv.append(projDiv);
 
@@ -2710,6 +2715,7 @@ function createTask(taskInfoObj) {
 function actOnProjEle(objClicked) {
     const newProjBtn = objClicked.target.closest("#new-proj-btn");
     const projModalHeader = document.getElementById("proj-modal-header");
+    const projDiv = objClicked.target.closest(".proj");
     const editProjBtn = objClicked.target.closest(".edit-proj-btn");
     const trashProjBtn = objClicked.target.closest(".trash-proj-btn");
 
@@ -2717,6 +2723,22 @@ function actOnProjEle(objClicked) {
         projModalHeader.innerText = "New Project";
         createProjBtn.innerText = "Create Project";
         showNewProjModal();
+    }
+
+    if (projDiv) {
+        navLinks.forEach(i => {
+            i.children[0].classList.remove("active-nav");
+        });
+
+        for (let i = 0; i < projCards.length; i++) {
+            projCards[i].classList.remove("active-proj");
+            const projName = projCards[i].firstElementChild.innerText;
+            const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
+            if (projDiv.getAttribute("proj") === projNameConvert) {
+                const clickedProjCard = projCards[i];
+                clickedProjCard.classList.add("active-proj");
+            }
+        }
     }
 
     if (editProjBtn) {
