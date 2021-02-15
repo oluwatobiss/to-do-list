@@ -1,3 +1,9 @@
+:root {
+    --jet: #343434;
+    --oxford-blue: #002147;
+    --glaucous-blue: #6082b6;
+}
+
 html, body {
     height: 100%;
     margin: 0;
@@ -7,7 +13,7 @@ html, body {
 #content {
     height: inherit;
     font-family: 'Mukta', sans-serif;
-    color: #343434;
+    color: var(--jet);
 }
 
 #main-header {
@@ -19,7 +25,7 @@ html, body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #002147;
+    background-color: var(--oxford-blue);
 }
 
 #main-header a {
@@ -46,7 +52,7 @@ li {
 }
 
 .active-nav {
-    border-bottom: 4px solid #ffa500;
+    border-bottom: 4px solid orange;
     padding-bottom: 11px;
 }
 
@@ -55,16 +61,17 @@ aside {
     top: 0;
     left: 0;
     height: inherit;
-    width: 250px;
+    width: 280px;
     margin-top: 50px;
     display: grid;
     grid-template-rows: 10% 80% 10%;
-    background-color: #dcdcdc;
+    background-color: gainsboro;
 }
 
 button {
     font-family: 'Mukta', sans-serif;
     font-size: .95rem;
+    cursor: pointer;
 }
 
 button:focus, input:focus {
@@ -77,8 +84,12 @@ button:focus, input:focus {
     border: none;
     align-self: center;
     justify-self: center;
-    background-color: #6082b6;
+    background-color: var(--glaucous-blue);
     color: white;
+}
+
+#new-proj-btn:active, #add-new-task-btn:active, .modal-box button:active {
+    box-shadow: inset 0 0.6em 2em -0.3em rgba(0,0,0,0.25), inset 0 0 0em 0.05em rgba(255,255,255,0.12);
 }
 
 .proj {
@@ -95,9 +106,19 @@ button:focus, input:focus {
     cursor: pointer;
 }
 
+#proj-list {
+    overflow-y: auto;
+}
+
 .active-proj {
-    border-left: 4px solid #ffa500;
-    background-color: #fffacd;
+    border-left: 4px solid orange;
+    background-color: lemonchiffon;
+}
+
+.proj-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .proj button {
@@ -109,33 +130,8 @@ button:focus, input:focus {
     transition: font-size .2s;
 }
 
-.proj button:hover {
-    font-size: 1.1rem;
-}
-
 .proj:hover > button {
-    color: #a9a9a9;
-}
-
-.task-info .edit-task-btn, .task-info .trash-task-btn {
-    color: #ffffff;
-    transition: font-size .2s;
-}
-
-.task-info:hover > .edit-task-btn, .task-info:hover > .trash-task-btn {
-    color: #c0c0c0;
-}
-
-.edit-task-btn:hover, .trash-task-btn:hover {
-    font-size: 1.1rem;
-}
-
-.important-btn {
-    color: #c0c0c0;
-}
-
-.important-task {
-    color: #ffa500;
+    color: darkgrey;
 }
 
 .task-amt {
@@ -144,7 +140,7 @@ button:focus, input:focus {
 
 footer {
     text-align: center;
-    background-color: #002147;
+    background-color: var(--oxford-blue);
 }
 
 footer a {
@@ -158,8 +154,8 @@ main {
 }
 
 #active-page-header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 80% 20%;
     margin-bottom: 10px;
 }
 
@@ -172,7 +168,7 @@ main {
     border: none;
     border-radius: 3px;
     align-self: center;
-    background-color: #ffa500;
+    background-color: orange;
 }
 
 .task-info {
@@ -182,17 +178,24 @@ main {
     border-bottom: 1px solid lightgrey;
 }
 
-.task-info input {
+.task-done-chkbox {
     margin: 10px;
+    cursor: pointer;
 }
 
-.task-info div {
+.task-and-due-date {
     display: flex;
     flex-direction: column;
+    cursor: pointer;
 }
 
 .task-done {
     text-decoration: line-through;
+    color: grey;
+}
+
+.due-date {
+    font-size: .8rem;
     color: grey;
 }
 
@@ -202,9 +205,21 @@ main {
     background: none;
 }
 
-.due-date {
-    font-size: .8rem;
-    color: grey;
+.important-task {
+    color: orange;
+}
+
+.task-info .edit-task-btn, .task-info .trash-task-btn {
+    color: white;
+    transition: font-size .2s;
+}
+
+.important-btn, .task-info:hover > .edit-task-btn, .task-info:hover > .trash-task-btn {
+    color: silver;
+}
+
+.proj button:hover, .edit-task-btn:hover, .trash-task-btn:hover {
+    font-size: 1.1rem;
 }
 
 .task-note {
@@ -250,7 +265,7 @@ main {
     background-color: white;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5), 0 6px 20px 0 rgba(0,0,0,0.3);
     padding: 0;
-    width: 28%;
+    width: 25%;
     animation-name: animate-new-proj-modal-box;
     animation-duration: 1s;
 }
@@ -318,7 +333,7 @@ label {
 }
 
 .modal-btn {
-    border: 1px solid #002147;
+    border: 1px solid var(--oxford-blue);
     border-radius: 3px;
     margin-left: 5.5px;
     padding: 7px 15px;
@@ -328,14 +343,14 @@ label {
 .create-btn {
     margin-right: 5px;
     min-width: 120px;
-    background-color: #002147;
+    background-color: var(--oxford-blue);
     color: white;
 }
 
 .create-btn:hover {
-    background-color: #6082b6;
+    background-color: var(--glaucous-blue);
 }
 
 .cancel-btn {
-    color: #002147;
+    color: var(--oxford-blue);
 }

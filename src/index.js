@@ -35,14 +35,14 @@ const addTaskBtn = document.getElementById("add-task-btn");
 const todaysDate = new Date();
 const startOfTodaysWeek = startOfWeek(todaysDate);
 const startOfNextWeek = addDays(startOfTodaysWeek, 7);
-console.log(startOfNextWeek);
 
 const projsAndTasks = {
     Important: [], 
     Random: []
 };
 
-const defaultProjs = (() => {
+// Create Important and Random projects as the two default projects
+(() => {
     for (const prop in projsAndTasks) {
         if (prop === "Important" || prop === "Random") {
             const projNameConvert = prop.toLowerCase().replace(/\W/g, "-");
@@ -52,7 +52,6 @@ const defaultProjs = (() => {
             taskAmtSpan.classList.add("task-amt", `${projNameConvert}-task-amt`);
             
             const projDiv = shared.createElement("div", [projNameSpan, taskAmtSpan], {class: "proj", proj: projNameConvert});
-            projDiv.addEventListener("click", displayProj);
             projListDiv.append(projDiv);
 
             if (prop !== "Important") {
@@ -63,33 +62,21 @@ const defaultProjs = (() => {
     }
 })();
 
-let clickedProjCardIndex = null;
-let clickedTaskCardIndex = null;
+let clickedProjIndex = null;
+let clickedTaskIndex = null;
 
 window.addEventListener("click", closeModal);
 window.addEventListener("load", () => displayNavName("windowLoaded"));
 logo.addEventListener("click", () => displayNavName("logoClicked"))
 navLinks.forEach(i => i.addEventListener("click", displayNavName));
-createProjBtn.addEventListener("click", addProjName);
-addTaskBtn.addEventListener("click", addTask);
-mainEleNode.addEventListener("click", actOnTaskEle);
 asideEleNode.addEventListener("click", actOnProjEle);
-
-function displayProj() {
-    const clickedProj = this.querySelector(".proj-name").innerText;
-    activePgTitle.innerText = clickedProj;
-
-    while (activePgBody.firstChild) {
-        activePgBody.firstChild.remove();
-    }
-
-    projsAndTasks[clickedProj].forEach(i => createTask(i));
-}
+createProjBtn.addEventListener("click", addProjName);
+mainEleNode.addEventListener("click", actOnTaskEle);
+addTaskBtn.addEventListener("click", addTask);
 
 function closeModal(objClicked) {
     if (objClicked.target === newProjModalBg || objClicked.target === closeProjModalBtn || objClicked.target === cancelProjBtn) {
-        modalBoxProjTitle.value = "";
-        newProjModalBg.style.display = "none";
+        closeProjModalBox();
     }
     if (objClicked.target === newTaskModalBg || objClicked.target === closeTaskModalBtn || objClicked.target === cancelTaskBtn) {
         modalBoxTaskTitle.value = "";
@@ -98,6 +85,11 @@ function closeModal(objClicked) {
         modalBoxTaskImportance.checked = false;
         newTaskModalBg.style.display = "none";
     }
+}
+
+function closeProjModalBox() {
+    modalBoxProjTitle.value = "";
+    newProjModalBg.style.display = "none";
 }
 
 function displayNavName(event) {
@@ -110,6 +102,7 @@ function displayNavName(event) {
     }
 
     let clickedNavLink = null;
+
     if (event === "windowLoaded" || event === "logoClicked" || event === "projDeleted") {
         clickedNavLink = "Today";
     } else {
@@ -127,7 +120,6 @@ function displayNavName(event) {
         for (const prop in projsAndTasks) {
             if (prop !== "Important") {
                 projsAndTasks[prop].forEach(showTodaysTask);
-
                 function showTodaysTask(task) {
                     if (isToday(parseISO(task.dueDate))) {
                         createTask(task);
@@ -142,7 +134,6 @@ function displayNavName(event) {
         for (const prop in projsAndTasks) {
             if (prop !== "Important") {
                 projsAndTasks[prop].forEach(showTomorrowsTask);
-
                 function showTomorrowsTask(task) {
                     if (isTomorrow(parseISO(task.dueDate))) {
                         createTask(task);
@@ -157,7 +148,6 @@ function displayNavName(event) {
         for (const prop in projsAndTasks) {
             if (prop !== "Important") {
                 projsAndTasks[prop].forEach(showThisWeeksTask);
-
                 function showThisWeeksTask(task) {
                     if (isThisWeek(parseISO(task.dueDate))) {
                         createTask(task);
@@ -172,7 +162,6 @@ function displayNavName(event) {
         for (const prop in projsAndTasks) {
             if (prop !== "Important") {
                 projsAndTasks[prop].forEach(showNextWeeksTask);
-
                 function showNextWeeksTask(task) {
                     if (isSameWeek(parseISO(task.dueDate), startOfNextWeek)) {
                         createTask(task);
@@ -192,25 +181,174 @@ function displayNavName(event) {
     }
 }
 
-function showNewProjModal() {
-    newProjModalBg.style.display = "block";
+function createTask(taskInfoObj) {
+    const taskConvert = taskInfoObj.task.toLowerCase().replace(/\W/g, "-");
+    const taskDoneInputEle = shared.createElement("input", null, {type: "checkbox", class: "task-done-chkbox"});
+    const taskSpan = shared.createElement("span", [taskInfoObj.task]);
+
+    if (taskInfoObj.taskDone) {
+        taskDoneInputEle.checked = true;
+        taskSpan.classList.add("task", "task-done");
+    } else {
+        taskDoneInputEle.checked = false;
+        taskSpan.classList.add("task");
+    }
+
+    const dueDateInWords = new Date(taskInfoObj.dueDate).toDateString();
+    const dueDateSpan = shared.createElement("span", null, {class: "due-date"});
+
+    if (taskInfoObj.dueDate) {
+        dueDateSpan.append(`Due: ${dueDateInWords} • ${formatDistance(parseISO(taskInfoObj.dueDate), todaysDate, {addSuffix: true})}`);
+    }
+
+    const taskAndDateDiv = shared.createElement("div", [taskSpan, dueDateSpan], {class: "task-and-due-date"});
+
+    const starIcon = document.createElement("i");
+    let starBtn = null;
+
+    if (taskInfoObj.important) {
+        starIcon.classList.add("fas", "fa-star", "important-task");
+        starBtn = shared.createElement("button", [starIcon], {class: "important-btn", important: true});
+    } else {
+        starIcon.classList.add("fas", "fa-star");
+        starBtn = shared.createElement("button", [starIcon], {class: "important-btn", important: false});
+    }
+
+    const penIcon = document.createElement("i");
+    penIcon.classList.add("fas", "fa-pen");
+    const penBtn =  shared.createElement("button", [penIcon], {class: "edit-task-btn"});
+
+    const trashIcon = document.createElement("i");
+    trashIcon.classList.add("fas", "fa-trash");
+    const trashBtn = shared.createElement("button", [trashIcon], {class: "trash-task-btn"});
+
+    const taskInfoSecEle = shared.createElement("section", [taskDoneInputEle, taskAndDateDiv, starBtn, penBtn, trashBtn], {class: "task-info", task: taskConvert});
+    
+    const noteStrongEle =shared.createElement("strong", ["Note:"]);
+    const noteHeaderSpan = shared.createElement("span", [noteStrongEle], {class: "note-header"});
+    const noteBodySpan = shared.createElement("span", [taskInfoObj.note], {class: "note-body"});
+    const taskProjSpan = shared.createElement("span", null, {class: "task-proj", taskproj: taskInfoObj.taskProj});
+    taskProjSpan.innerHTML = `<strong>Project:</strong> ${taskInfoObj.taskProj}`;
+    const taskNoteSecEle = shared.createElement("section", [noteHeaderSpan, noteBodySpan, taskProjSpan], {class: "task-note"});
+
+    const taskCardDiv = shared.createElement("div", [taskInfoSecEle, taskNoteSecEle], {class: "task-card"});
+    activePgBody.append(taskCardDiv);
+}
+
+function actOnProjEle(objClicked) {
+    const newProjBtn = objClicked.target.closest("#new-proj-btn");
+    const projModalHeader = document.getElementById("proj-modal-header");
+    const projDiv = objClicked.target.closest(".proj");
+    const editProjBtn = objClicked.target.closest(".edit-proj-btn");
+    const trashProjBtn = objClicked.target.closest(".trash-proj-btn");
+
+    if (newProjBtn) {
+        projModalHeader.innerText = "New Project";
+        createProjBtn.innerText = "Create Project";
+        showNewProjModal();
+    }
+
+    if (projDiv) {
+        navLinks.forEach(i => {
+            i.children[0].classList.remove("active-nav");
+        });
+
+        for (let i = 0; i < projCards.length; i++) {
+            projCards[i].classList.remove("active-proj");
+            const projName = projCards[i].firstElementChild.innerText;
+            const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
+            if (projDiv.getAttribute("proj") === projNameConvert) {
+                const clickedProjCard = projCards[i];
+                clickedProjCard.classList.add("active-proj");
+                activePgTitle.innerText = projName;
+                while (activePgBody.firstChild) {
+                    activePgBody.firstChild.remove();
+                }
+                projsAndTasks[projName].forEach(i => createTask(i));
+            }
+        }
+    }
+
+    if (editProjBtn) {
+        projModalHeader.innerText = "Edit Project";
+        createProjBtn.innerText = "Update Project";
+        for (let i = 0; i < projCards.length; i++) {
+            const projName = projCards[i].firstElementChild.innerText;
+            const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
+            if (editProjBtn.getAttribute("proj") === projNameConvert) {
+                modalBoxProjTitle.value = projName;
+                clickedProjIndex = i;
+                showNewProjModal();
+            }
+        }
+    }
+
+    if (trashProjBtn) {
+        for (let i = 0; i < projCards.length; i++) {
+            const projName = projCards[i].firstElementChild.innerText;
+            const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
+            if (trashProjBtn.getAttribute("proj") === projNameConvert) {
+                const clickedProjCard = projCards[i];
+                const clickedProjName = clickedProjCard.querySelector(".proj-name").innerText;
+                projsAndTasks[clickedProjName].forEach(checkIfTaskIsImp);
+                projDropDown.querySelector(`#${projNameConvert}-proj-opt`).remove();
+                delete projsAndTasks[clickedProjName];
+                clickedProjCard.remove();
+                displayNavName("projDeleted");
+                function checkIfTaskIsImp(currItem) {
+                    if (currItem.important) {
+                        const tasksProjName = currItem.taskProj;
+                        const taskTitle = currItem.task;
+                        projsAndTasks.Important.forEach(delTaskFromImpProj);
+                        function delTaskFromImpProj(currItem, currItemInd) {
+                            if (currItem.taskProj === tasksProjName && currItem.task === taskTitle) {
+                                projsAndTasks.Important.splice(currItemInd, 1);
+                                document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function showNewProjModal() {
+        newProjModalBg.style.display = "block";
+    }
 }
 
 function addProjName() {
     if (!modalBoxProjTitle.value) {
         alert("Error: Name field must not be blank. Please provide a project name.");
     } else {
-        if (createProjBtn.innerText === "Create Project") {
-            for (const prop in projsAndTasks) {
-                if (prop.toLowerCase() === modalBoxProjTitle.value.toLowerCase()) {
-                    alert("Error: A project already exist with that name. Please choose a different project name.");
-                    return;
-                }
-            }
+        if (createProjBtn.innerText === "Create Project" && !checkIfNameExist()) {
             Object.assign(projsAndTasks, {[modalBoxProjTitle.value]: []});
             createProj(modalBoxProjTitle.value);
-        } else {
-            const currProjName = projCards[clickedProjCardIndex].querySelector(".proj-name").innerText;
+            function createProj(projName) {
+                const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
+                const projNameSpan = shared.createElement("span", [projName], {class: "proj-name"});
+            
+                const taskAmtSpan = shared.createElement("span", [projsAndTasks[projName].length]);
+                taskAmtSpan.classList.add("task-amt", `${projNameConvert}-task-amt`);
+            
+                const editIcon = document.createElement("i");
+                editIcon.classList.add("fas", "fa-pen");
+                const editBtn = shared.createElement("button", [editIcon], {class: "edit-proj-btn", proj: projNameConvert});
+            
+                const deleteIcon = document.createElement("i");
+                deleteIcon.classList.add("fas", "fa-trash");
+                const deleteBtn = shared.createElement("button", [deleteIcon], {class: "trash-proj-btn", proj: projNameConvert});
+                
+                const projDiv = shared.createElement("div", [projNameSpan, taskAmtSpan, editBtn, deleteBtn], {class: "proj", proj: projNameConvert});
+                projListDiv.append(projDiv);
+            
+                const projOptEle = shared.createElement("option", [projName], {id: `${projNameConvert}-proj-opt`});
+                projDropDown.append(projOptEle);
+            
+                closeProjModalBox();
+            }
+        } else if (createProjBtn.innerText === "Update Project" && !checkIfNameExist()) {
+            const currProjName = projCards[clickedProjIndex].querySelector(".proj-name").innerText;
             const currprojNameConvert = currProjName.toLowerCase().replace(/\W/g, "-");
 
             const newProjName = modalBoxProjTitle.value;
@@ -219,54 +357,32 @@ function addProjName() {
             const projOptEle = shared.createElement("option", [newProjName], {id: `${newprojNameConvert}-proj-opt`});
             projDropDown.querySelector(`#${currprojNameConvert}-proj-opt`).replaceWith(projOptEle);
 
-            projCards[clickedProjCardIndex].querySelector(".task-amt").classList.add(`${newprojNameConvert}-task-amt`);
-            projCards[clickedProjCardIndex].querySelector(".task-amt").classList.remove(`${currprojNameConvert}-task-amt`);
+            // Replace project name and attributes in the name span, amount span, edit button, and trash button
+            projCards[clickedProjIndex].setAttribute("proj", newprojNameConvert);
+            projCards[clickedProjIndex].querySelector(".proj-name").innerText = newProjName;
+            projCards[clickedProjIndex].querySelector(".task-amt").classList.add(`${newprojNameConvert}-task-amt`);
+            projCards[clickedProjIndex].querySelector(".task-amt").classList.remove(`${currprojNameConvert}-task-amt`);
+            projCards[clickedProjIndex].querySelector(".edit-proj-btn").setAttribute("proj", newprojNameConvert);
+            projCards[clickedProjIndex].querySelector(".trash-proj-btn").setAttribute("proj", newprojNameConvert);
 
-            projCards[clickedProjCardIndex].querySelector(".edit-proj-btn").setAttribute("proj", newprojNameConvert);
-            projCards[clickedProjCardIndex].querySelector(".trash-proj-btn").setAttribute("proj", newprojNameConvert);
-
+            // Transfer the content of the old project object to the new project object and delete the old project object
             projsAndTasks[newProjName] = projsAndTasks[currProjName];
             delete projsAndTasks[currProjName];
 
             if (activePgTitle.innerText === currProjName) {
                 activePgTitle.innerText = newProjName;
             }
-
-            projCards[clickedProjCardIndex].querySelector(".proj-name").innerText = newProjName;
-            newProjModalBg.style.display = "none";
-            modalBoxProjTitle.value = "";
+            closeProjModalBox();
+        }
+        function checkIfNameExist() {
+            for (const prop in projsAndTasks) {
+                if (prop.toLowerCase() === modalBoxProjTitle.value.toLowerCase()) {
+                    alert("Error: A project already exist with that name. Please choose a different project name.");
+                    return true;
+                }
+            }
         }
     }
-}
-
-function createProj(projName) {
-    const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
-    const projNameSpan = shared.createElement("span", [projName], {class: "proj-name"});
-
-    const taskAmtSpan = shared.createElement("span", [projsAndTasks[projName].length]);
-    taskAmtSpan.classList.add("task-amt", `${projNameConvert}-task-amt`);
-
-    const editIcon = document.createElement("i");
-    editIcon.classList.add("fas", "fa-pen");
-    const editBtn = shared.createElement("button", [editIcon], {class: "edit-proj-btn", proj: projNameConvert});
-
-    const deleteIcon = document.createElement("i");
-    deleteIcon.classList.add("fas", "fa-trash");
-    const deleteBtn = shared.createElement("button", [deleteIcon], {class: "trash-proj-btn", proj: projNameConvert});
-    
-    const projDiv = shared.createElement("div", [projNameSpan, taskAmtSpan, editBtn, deleteBtn], {class: "proj", proj: projNameConvert});
-    projDiv.addEventListener("click", displayProj);
-    projListDiv.append(projDiv);
-
-    const projOptEle = shared.createElement("option", [projName], {id: `${projNameConvert}-proj-opt`});
-    projDropDown.append(projOptEle);
-
-    modalBoxProjTitle.value = "";
-    newProjModalBg.style.display = "none";
-}
-
-function showNewTaskModal() {
-    newTaskModalBg.style.display = "block";
 }
 
 function addTask() {
@@ -296,13 +412,13 @@ function addTask() {
                     document.querySelector(`.${projNameConvert}-task-amt`).innerText = projsAndTasks[prop].length;
                     
                     if (
-                        (activePgTitle.innerText === "Today" && isToday(parseISO(taskInfo.dueDate))) ||
-                        (activePgTitle.innerText === "Tomorrow" && isTomorrow(parseISO(taskInfo.dueDate))) ||
-                        (activePgTitle.innerText === "This Week" && isThisWeek(parseISO(taskInfo.dueDate))) ||
-                        (activePgTitle.innerText === "Next Week" && isSameWeek(parseISO(taskInfo.dueDate), startOfNextWeek)) ||
+                        ((activePgTitle.innerText === "Today") && isToday(parseISO(taskInfo.dueDate))) ||
+                        ((activePgTitle.innerText === "Tomorrow") && isTomorrow(parseISO(taskInfo.dueDate))) ||
+                        ((activePgTitle.innerText === "This Week") && isThisWeek(parseISO(taskInfo.dueDate))) ||
+                        ((activePgTitle.innerText === "Next Week") && isSameWeek(parseISO(taskInfo.dueDate), startOfNextWeek)) ||
                         activePgTitle.innerText === "All Tasks" ||
                         activePgTitle.innerText === projDropDown.value ||
-                        (activePgTitle.innerText === "Important" && taskInfo.important)
+                        ((activePgTitle.innerText === "Important") && taskInfo.important)
                         ) {
                         createTask(taskInfo);
                     }
@@ -312,10 +428,10 @@ function addTask() {
             for (const prop in projsAndTasks) {
                 // Find the selected project
                 if (prop === projDropDown.value) {
-                    const clickedTaskProjName = taskCards[clickedTaskCardIndex].querySelector(".task-proj").getAttribute("taskProj");
-                    const clickedTaskChkBox = taskCards[clickedTaskCardIndex].querySelector(".task-done-chkbox");
-                    const clickedTaskImportance = taskCards[clickedTaskCardIndex].querySelector(".important-btn").getAttribute("important");
-                    const clickedTaskCard = activePgBody.children[clickedTaskCardIndex];
+                    const clickedTaskCard = taskCards[clickedTaskIndex];
+                    const clickedTaskChkBox = clickedTaskCard.querySelector(".task-done-chkbox");
+                    const clickedTaskImportance = clickedTaskCard.querySelector(".important-btn").getAttribute("important");
+                    const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskproj");
                     const clickedTaskTitle = clickedTaskCard.querySelector(".task").innerText;
                     // Store the new task details
                     const taskInfo = {
@@ -368,7 +484,7 @@ function addTask() {
                         // Move updated task to the selected project
                         if (activePgTitle.innerText === clickedTaskProjName) {
                             console.log("Page title and clicked task's project are the same!");
-                            const removedTask = projsAndTasks[clickedTaskProjName].splice(clickedTaskCardIndex, 1);
+                            const removedTask = projsAndTasks[clickedTaskProjName].splice(clickedTaskIndex, 1);
                             projsAndTasks[projDropDown.value].push(removedTask[0]);
                         } else {
                             console.log("Page title and clicked task's project are different!");
@@ -435,144 +551,6 @@ function addTask() {
     }
 }
 
-function createTask(taskInfoObj) {
-    console.log(taskInfoObj);
-    console.log(taskInfoObj.task);
-    const taskSpan = shared.createElement("span", [taskInfoObj.task]);
-    const taskConvert = taskInfoObj.task.toLowerCase().replace(/\W/g, "-");
-    const taskDoneInputEle = shared.createElement("input", null, {type: "checkbox", class: "task-done-chkbox", task: taskConvert});
-    const dueDateInWords = new Date(taskInfoObj.dueDate).toDateString();
-
-    if (taskInfoObj.taskDone) {
-        taskDoneInputEle.checked = true;
-        taskSpan.classList.add("task", "task-done");
-    } else {
-        taskDoneInputEle.checked = false;
-        taskSpan.classList.add("task");
-    }
-
-    const dueDateSpan = shared.createElement(
-        "span",
-        [`Due: ${dueDateInWords} • ${formatDistance(parseISO(taskInfoObj.dueDate), todaysDate, {addSuffix: true})}`],
-        {class: "due-date"}
-        );
-    const taskAndDateDiv = shared.createElement("div", [taskSpan, dueDateSpan], {class: "task-and-due-date", task: taskConvert});
-
-    const starIcon = document.createElement("i");
-    if (taskInfoObj.important) {
-        starIcon.classList.add("fas", "fa-star", "important-task");
-    } else {
-        starIcon.classList.add("fas", "fa-star");
-    }
-
-    let starBtn = null;
-
-    if (taskInfoObj.important) {
-        starBtn = shared.createElement("button", [starIcon], {class: "important-btn", task: taskConvert, important: true});
-    } else {
-        starBtn = shared.createElement("button", [starIcon], {class: "important-btn", task: taskConvert, important: false});
-    }
-
-    const penIcon = document.createElement("i");
-    penIcon.classList.add("fas", "fa-pen");
-    const penBtn =  shared.createElement("button", [penIcon], {class: "edit-task-btn", task: taskConvert});
-
-    const trashIcon = document.createElement("i");
-    trashIcon.classList.add("fas", "fa-trash");
-    const trashBtn = shared.createElement("button", [trashIcon], {class: "trash-task-btn", task: taskConvert});
-
-    const taskInfoSecEle = shared.createElement("section", [taskDoneInputEle, taskAndDateDiv, starBtn, penBtn, trashBtn], {class: "task-info"});
-    
-    const noteStrongEle =shared.createElement("strong", ["Note:"]);
-    const noteHeaderSpan = shared.createElement("span", [noteStrongEle], {class: "note-header"});
-    const noteBodySpan = shared.createElement("span", [taskInfoObj.note], {class: "note-body"});
-    const taskProjSpan = shared.createElement("span", null, {class: "task-proj", taskProj: taskInfoObj.taskProj});
-    taskProjSpan.innerHTML = `<strong>Project:</strong> ${taskInfoObj.taskProj}`;
-    const taskNoteSecEle = shared.createElement("section", [noteHeaderSpan, noteBodySpan, taskProjSpan], {class: "task-note"});
-
-    const taskCardDiv = shared.createElement("div", [taskInfoSecEle, taskNoteSecEle], {class: "task-card"});
-    activePgBody.append(taskCardDiv);
-}
-
-function actOnProjEle(objClicked) {
-    const newProjBtn = objClicked.target.closest("#new-proj-btn");
-    const projModalHeader = document.getElementById("proj-modal-header");
-    const projDiv = objClicked.target.closest(".proj");
-    const editProjBtn = objClicked.target.closest(".edit-proj-btn");
-    const trashProjBtn = objClicked.target.closest(".trash-proj-btn");
-
-    if (newProjBtn) {
-        projModalHeader.innerText = "New Project";
-        createProjBtn.innerText = "Create Project";
-        showNewProjModal();
-    }
-
-    if (projDiv) {
-        navLinks.forEach(i => {
-            i.children[0].classList.remove("active-nav");
-        });
-
-        for (let i = 0; i < projCards.length; i++) {
-            projCards[i].classList.remove("active-proj");
-            const projName = projCards[i].firstElementChild.innerText;
-            const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
-            if (projDiv.getAttribute("proj") === projNameConvert) {
-                const clickedProjCard = projCards[i];
-                clickedProjCard.classList.add("active-proj");
-            }
-        }
-    }
-
-    if (editProjBtn) {
-        projModalHeader.innerText = "Edit Project";
-        createProjBtn.innerText = "Update Project";
-
-        for (let i = 0; i < projCards.length; i++) {
-            const projName = projCards[i].firstElementChild.innerText;
-            const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
-
-            if (editProjBtn.getAttribute("proj") === projNameConvert) {
-                const clickedProjCard = projCards[i];
-                modalBoxProjTitle.value = clickedProjCard.querySelector(".proj-name").innerText;
-                clickedProjCardIndex = i;
-                showNewProjModal();
-            }
-        }
-    }
-
-    if (trashProjBtn) {
-        for (let i = 0; i < projCards.length; i++) {
-            const projName = projCards[i].firstElementChild.innerText;
-            const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
-
-            if (trashProjBtn.getAttribute("proj") === projNameConvert) {
-                const clickedProjCard = projCards[i];
-                const clickedProjName = clickedProjCard.querySelector(".proj-name").innerText;
-                projsAndTasks[clickedProjName].forEach(checkIfTaskIsImp);
-                console.log(`#${projNameConvert}`);
-                projDropDown.querySelector(`#${projNameConvert}-proj-opt`).remove();
-                delete projsAndTasks[clickedProjName];
-                clickedProjCard.remove();
-                displayNavName("projDeleted");
-
-                function checkIfTaskIsImp(currItem) {
-                    if (currItem.important) {
-                        const tasksProjName = currItem.taskProj;
-                        const taskTitle = currItem.task;
-                        projsAndTasks.Important.forEach(delTaskFromImpProj);
-                        function delTaskFromImpProj(currItem, currItemInd) {
-                            if (currItem.taskProj === tasksProjName && currItem.task === taskTitle) {
-                                projsAndTasks.Important.splice(currItemInd, 1);
-                                document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 function actOnTaskEle(objClicked) {
     const addNewTaskBtn = objClicked.target.closest("#add-new-task-btn");
     const taskModalHeader = document.getElementById("task-modal-header");
@@ -582,61 +560,12 @@ function actOnTaskEle(objClicked) {
     const editTaskBtn = objClicked.target.closest(".edit-task-btn");
     const trashTaskBtn = objClicked.target.closest(".trash-task-btn");
 
-    if (taskDoneChkBox) {
-        for (let i = 0; i < taskCards.length; i++) {
-            const task = taskCards[i].querySelector(".task").innerText;
-            const taskConvert = task.toLowerCase().replace(/\W/g, "-");
-            if (taskDoneChkBox.getAttribute("task") === taskConvert) {
-                clickedTaskCardIndex = i;
-            }
-        }
-        const clickedTaskCard = taskCards[clickedTaskCardIndex];
-        const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskProj");
-        const clickedTaskTitle = clickedTaskCard.querySelector(".task").innerText;
-
-        const clickedCardTask = activePgBody.children[clickedTaskCardIndex].querySelector(".task");
-        clickedCardTask.classList.toggle("task-done");
-
-        if (taskDoneChkBox.checked) {
-            projsAndTasks[clickedTaskProjName].forEach(changeTaskDoneToTrue);
-
-            function changeTaskDoneToTrue(currItem, currItemInd) {
-                if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
-                    projsAndTasks[clickedTaskProjName][currItemInd].taskDone = true;
-                }
-            }
-        } else {
-            projsAndTasks[clickedTaskProjName].forEach(changeTaskDoneToFalse);
-
-            function changeTaskDoneToFalse(currItem, currItemInd) {
-                if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
-                    projsAndTasks[clickedTaskProjName][currItemInd].taskDone = false;
-                }
-            }
-        }
-    }
-
-    if (taskAndDueDateDiv) {
-        for (let i = 0; i < taskCards.length; i++) {
-            const task = taskCards[i].querySelector(".task").innerText;
-            const taskConvert = task.toLowerCase().replace(/\W/g, "-");
-            if (taskAndDueDateDiv.getAttribute("task") === taskConvert) {
-                clickedTaskCardIndex = i;
-            }
-        }
-        const clickedCardNote = activePgBody.children[clickedTaskCardIndex].querySelector(".task-note");
-        if (clickedCardNote.style.display === "") {
-            clickedCardNote.style.display = "grid";
-        } else {
-            clickedCardNote.style.display = "";
-        }
-    }
-
     if (addNewTaskBtn) {
+        const projOptsArr = Array.from(projDropDown.children);
         taskModalHeader.innerText = "New Task";
         addTaskBtn.innerText = "Add Task";
-        
-        const projOptsArr = Array.from(projDropDown.children);
+
+        // Pre-choose the project to which the new task should be added
         if (projOptsArr.some(i => i.value === activePgTitle.innerText)) {
             const activePgProjOptIndex = projOptsArr.findIndex((i) => i.value === activePgTitle.innerText);
             projDropDown.children[activePgProjOptIndex].selected = true;
@@ -647,38 +576,63 @@ function actOnTaskEle(objClicked) {
         showNewTaskModal();
     }
 
-    if (starIcon) {
-        for (let i = 0; i < taskCards.length; i++) {
-            const task = taskCards[i].querySelector(".task").innerText;
-            const taskConvert = task.toLowerCase().replace(/\W/g, "-");
-            if (starIcon.closest("button").getAttribute("task") === taskConvert) {
-                clickedTaskCardIndex = i;
+    if (taskDoneChkBox) {
+        getClickedTaskIndex(taskDoneChkBox);
+        const clickedTaskCard = taskCards[clickedTaskIndex];
+        const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskproj");
+        const clickedCardTask = clickedTaskCard.querySelector(".task");
+        const clickedTaskTitle = clickedCardTask.innerText;
+
+        // Toggle the task-done's class state and the taskDone property state
+        clickedCardTask.classList.toggle("task-done");
+        if (taskDoneChkBox.checked) {
+            projsAndTasks[clickedTaskProjName].forEach(changeTaskDoneToTrue);
+            function changeTaskDoneToTrue(currItem, currItemInd) {
+                if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
+                    projsAndTasks[clickedTaskProjName][currItemInd].taskDone = true;
+                }
+            }
+        } else {
+            projsAndTasks[clickedTaskProjName].forEach(changeTaskDoneToFalse);
+            function changeTaskDoneToFalse(currItem, currItemInd) {
+                if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
+                    projsAndTasks[clickedTaskProjName][currItemInd].taskDone = false;
+                }
             }
         }
+    }
 
-        const clickedTaskCard = taskCards[clickedTaskCardIndex];
-        const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskProj");
+    if (taskAndDueDateDiv) {
+        getClickedTaskIndex(taskAndDueDateDiv);
+        const clickedCardNote = taskCards[clickedTaskIndex].querySelector(".task-note");
+        if (clickedCardNote.style.display === "") {
+            clickedCardNote.style.display = "grid";
+        } else {
+            clickedCardNote.style.display = "";
+        }
+    }
+
+    if (starIcon) {
+        getClickedTaskIndex(starIcon.closest("button"));
+        const clickedTaskCard = taskCards[clickedTaskIndex];
+        const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskproj");
         const clickedTaskTitle = clickedTaskCard.querySelector(".task").innerText;
 
         starIcon.classList.toggle("important-task");
 
         if (activePgTitle.innerText === "Important") {
             projsAndTasks[clickedTaskProjName].forEach(changeImpToFalse);
-
+            projsAndTasks.Important.forEach(delTaskFromImpProj);
+            while (activePgBody.firstChild) {
+                activePgBody.firstChild.remove();
+            }
+            projsAndTasks.Important.forEach(i => createTask(i));
             function changeImpToFalse(currItem, currItemInd) {
                 if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
                     projsAndTasks[clickedTaskProjName][currItemInd].important = false;
                     clickedTaskCard.querySelector(".important-btn").setAttribute("important", false);
                 }
             }
-
-            projsAndTasks.Important.forEach(delTaskFromImpProj);
-            
-            while (activePgBody.firstChild) {
-                activePgBody.firstChild.remove();
-            }
-
-            projsAndTasks.Important.forEach(i => createTask(i));
         }
 
         if (activePgTitle.innerText !== "Important") {
@@ -690,7 +644,6 @@ function actOnTaskEle(objClicked) {
                 activePgTitle.innerText === "All Tasks"
                 ) {
                 projsAndTasks[clickedTaskProjName].forEach(changeTaskImportance);
-
                 function changeTaskImportance(currItem, currItemInd) {
                     if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
                         if (currItem.important) {
@@ -706,14 +659,14 @@ function actOnTaskEle(objClicked) {
                     }
                 }
             } else {
-                if (projsAndTasks[clickedTaskProjName][clickedTaskCardIndex].important) {
-                    projsAndTasks[clickedTaskProjName][clickedTaskCardIndex].important = false;
+                if (projsAndTasks[clickedTaskProjName][clickedTaskIndex].important) {
+                    projsAndTasks[clickedTaskProjName][clickedTaskIndex].important = false;
                     clickedTaskCard.querySelector(".important-btn").setAttribute("important", false);
                     projsAndTasks.Important.forEach(delTaskFromImpProj);
                 } else {
-                    projsAndTasks[clickedTaskProjName][clickedTaskCardIndex].important = true;
+                    projsAndTasks[clickedTaskProjName][clickedTaskIndex].important = true;
                     clickedTaskCard.querySelector(".important-btn").setAttribute("important", true);
-                    projsAndTasks.Important.push(projsAndTasks[clickedTaskProjName][clickedTaskCardIndex]);
+                    projsAndTasks.Important.push(projsAndTasks[clickedTaskProjName][clickedTaskIndex]);
                     document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
                 }
             }
@@ -728,19 +681,11 @@ function actOnTaskEle(objClicked) {
     }
 
     if (editTaskBtn) {
-        for (let i = 0; i < taskCards.length; i++) {
-            const task = taskCards[i].querySelector(".task").innerText;
-            const taskConvert = task.toLowerCase().replace(/\W/g, "-");
-            if (editTaskBtn.closest("button").getAttribute("task") === taskConvert) {
-                clickedTaskCardIndex = i;
-                console.log(`The clicked task is at index ${clickedTaskCardIndex}`);
-            }
-        }
-
+        getClickedTaskIndex(editTaskBtn.closest("button"));
         const projOptsArr = Array.from(projDropDown.children);
-        const clickedTaskCard = taskCards[clickedTaskCardIndex];
+        const clickedTaskCard = taskCards[clickedTaskIndex];
         const clickedTaskTitle = clickedTaskCard.querySelector(".task").innerText;
-        const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskProj");
+        const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskproj");
 
         taskModalHeader.innerText = "Edit Task";
         addTaskBtn.innerText = "Update Task";
@@ -762,10 +707,10 @@ function actOnTaskEle(objClicked) {
                 }
             }
         } else {
-            modalBoxTaskTitle.value = projsAndTasks[activePgTitle.innerText][clickedTaskCardIndex].task;
-            modalBoxTaskNote.value = projsAndTasks[activePgTitle.innerText][clickedTaskCardIndex].note;
-            modalBoxTaskDate.value = projsAndTasks[activePgTitle.innerText][clickedTaskCardIndex].dueDate;
-            modalBoxTaskImportance.checked = projsAndTasks[activePgTitle.innerText][clickedTaskCardIndex].important;
+            modalBoxTaskTitle.value = projsAndTasks[activePgTitle.innerText][clickedTaskIndex].task;
+            modalBoxTaskNote.value = projsAndTasks[activePgTitle.innerText][clickedTaskIndex].note;
+            modalBoxTaskDate.value = projsAndTasks[activePgTitle.innerText][clickedTaskIndex].dueDate;
+            modalBoxTaskImportance.checked = projsAndTasks[activePgTitle.innerText][clickedTaskIndex].important;
         }
 
         if (projOptsArr.some(i => i.value === clickedTaskProjName)) {
@@ -777,19 +722,11 @@ function actOnTaskEle(objClicked) {
     }
 
     if (trashTaskBtn) {
-        for (let i = 0; i < taskCards.length; i++) {
-            const task = taskCards[i].querySelector(".task").innerText;
-            const taskConvert = task.toLowerCase().replace(/\W/g, "-");
-            if (trashTaskBtn.closest("button").getAttribute("task") === taskConvert) {
-                clickedTaskCardIndex = i;
-            }
-        }
-        const clickedTaskCard = activePgBody.children[clickedTaskCardIndex];
-        const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskProj");
-        const clickedTaskProjNameConvert = clickedTaskProjName.toLowerCase().replace(/\W/g, "-");
+        getClickedTaskIndex(trashTaskBtn.closest("button"));
+        const clickedTaskCard = taskCards[clickedTaskIndex];
         const clickedTaskTitle = clickedTaskCard.querySelector(".task").innerText;
-
-        console.log(projsAndTasks[clickedTaskProjName]);
+        const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskproj");
+        const clickedTaskProjNameConvert = clickedTaskProjName.toLowerCase().replace(/\W/g, "-");
 
         if (activePgTitle.innerText !== "Important") {
             if (
@@ -799,6 +736,7 @@ function actOnTaskEle(objClicked) {
                 activePgTitle.innerText === "Next Week" ||
                 activePgTitle.innerText === "All Tasks"
                 ) {
+                // Find the clicked task in the projsAndTasks object and delete it
                 for (let i = 0; i < projsAndTasks[clickedTaskProjName].length; i++) {
                     const currItem = projsAndTasks[clickedTaskProjName][i];
                     if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
@@ -809,16 +747,17 @@ function actOnTaskEle(objClicked) {
                     }
                 }
             } else {
-                projsAndTasks[clickedTaskProjName].splice(clickedTaskCardIndex, 1);
-                if (projsAndTasks[clickedTaskProjName][clickedTaskCardIndex].important) {
+                // Delete the clicked task from the projsAndTasks object
+                projsAndTasks[clickedTaskProjName].splice(clickedTaskIndex, 1);
+                if (projsAndTasks[clickedTaskProjName][clickedTaskIndex].important) {
                     projsAndTasks.Important.forEach(delTaskFromImpProj);
                 }
             }
         }
 
         if (activePgTitle.innerText === "Important") {
+            // Find the clicked task in the projsAndTasks object and delete it
             projsAndTasks.Important.forEach(delTaskFromImpProj);
-
             for (let i = 0; i < projsAndTasks[clickedTaskProjName].length; i++) {
                 const currItem = projsAndTasks[clickedTaskProjName][i];
                 if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
@@ -827,6 +766,7 @@ function actOnTaskEle(objClicked) {
             }
         }
 
+        // Update the displayed number of tasks in the deleted task's project
         document.querySelector(`.${clickedTaskProjNameConvert}-task-amt`).innerText = projsAndTasks[clickedTaskProjName].length;
 
         while (activePgBody.firstChild) {
@@ -845,7 +785,6 @@ function actOnTaskEle(objClicked) {
                 for (const prop in projsAndTasks) {
                     if (prop !== "Important") {
                         projsAndTasks[prop].forEach(createTaskBasedOnNavClicked);
-
                         function createTaskBasedOnNavClicked(currItem) {
                             if (
                                 (activePgTitle.innerText === "Today" && isToday(parseISO(currItem.dueDate))) ||
@@ -867,6 +806,20 @@ function actOnTaskEle(objClicked) {
             if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
                 projsAndTasks.Important.splice(currItemInd, 1);
                 document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
+            }
+        }
+    }
+
+    function showNewTaskModal() {
+        newTaskModalBg.style.display = "block";
+    }
+
+    function getClickedTaskIndex(clickedEle) {
+        for (let i = 0; i < taskCards.length; i++) {
+            const task = taskCards[i].querySelector(".task").innerText;
+            const taskConvert = task.toLowerCase().replace(/\W/g, "-");
+            if (clickedEle.parentNode.getAttribute("task") === taskConvert) {
+                clickedTaskIndex = i;
             }
         }
     }
