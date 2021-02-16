@@ -1,8 +1,14 @@
-// const listeners = (() => {
-//     document.getElementById("new-proj-btn").addEventListener("click", createProj);
-//     function createProj() {
-//         document.getElementById("new-proj-modal-bg").style.display = "block";
-//     }
-// })();
+import {
+    DOM, closeModal, displayNavTasks, actOnClickedProjEle, addProjName, addTask, actOnClickedTaskEle
+} from "./aggregator.js";
 
-// export default listeners;
+export default function() {
+    window.addEventListener("click", closeModal);
+    window.addEventListener("load", () => displayNavTasks("windowLoaded"));
+    DOM.logo.addEventListener("click", () => displayNavTasks("logoClicked"))
+    DOM.navLinks.forEach(i => i.addEventListener("click", displayNavTasks));
+    DOM.asideEleNode.addEventListener("click", actOnClickedProjEle);
+    DOM.createProjBtn.addEventListener("click", addProjName);
+    DOM.addTaskBtn.addEventListener("click", addTask);
+    DOM.mainEleNode.addEventListener("click", actOnClickedTaskEle);
+};

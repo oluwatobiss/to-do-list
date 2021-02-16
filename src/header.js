@@ -9,7 +9,6 @@ const headerAreaContent = (() => {
 
     const menus = ["Today", "Tomorrow", "This Week", "Next Week", "All Tasks"];
     menus.forEach(createMenuLink);
-
     function createMenuLink(i) {
         const liEle = document.createElement("li");
         const anchorEle = shared.createElement("a", [i], {href: "#", class: "nav-link"});
