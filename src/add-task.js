@@ -32,6 +32,7 @@ export default function() {
                     }
                     
                     document.querySelector(`.${projNameConvert}-task-amt`).innerText = projsAndTasks[prop].length;
+                    localStorage.setItem("myPlans", JSON.stringify(projsAndTasks));
                     
                     if (
                         ((DOM.activePgTitle.innerText === "Today") && isToday(parseISO(taskInfo.dueDate))) ||
@@ -121,38 +122,38 @@ export default function() {
                         const projDropDownConvert = DOM.projDropDown.value.toLowerCase().replace(/\W/g, "-");
                         document.querySelector(`.${projDropDownConvert}-task-amt`).innerText = projsAndTasks[DOM.projDropDown.value].length;
                     }
-                    
-                        // Regenerate task cards
-                        while (DOM.activePgBody.firstChild) {
-                            DOM.activePgBody.firstChild.remove();
-                        }
-    
-                        if (
-                            DOM.activePgTitle.innerText === "Today" ||
-                            DOM.activePgTitle.innerText === "Tomorrow" ||
-                            DOM.activePgTitle.innerText === "This Week" ||
-                            DOM.activePgTitle.innerText === "Next Week" ||
-                            DOM.activePgTitle.innerText === "All Tasks"
-                            ) {
-                            for (const prop in projsAndTasks) {
-                                if (prop !== "Important") {
-                                    projsAndTasks[prop].forEach(createTaskBasedOnNavClicked);
-                                    function createTaskBasedOnNavClicked(currItem) {
-                                        if (
-                                            (DOM.activePgTitle.innerText === "Today" && isToday(parseISO(currItem.dueDate))) ||
-                                            (DOM.activePgTitle.innerText === "Tomorrow" && isTomorrow(parseISO(currItem.dueDate))) ||
-                                            (DOM.activePgTitle.innerText === "This Week" && isThisWeek(parseISO(currItem.dueDate))) ||
-                                            (DOM.activePgTitle.innerText === "Next Week" && isSameWeek(parseISO(currItem.dueDate), startOfNextWeek)) ||
-                                            DOM.activePgTitle.innerText === "All Tasks"
-                                            ) {
-                                            createTask(currItem);
-                                        }
+
+                    // Update the localStorage and the content displayed onscreen
+                    localStorage.setItem("myPlans", JSON.stringify(projsAndTasks));
+                    while (DOM.activePgBody.firstChild) {
+                        DOM.activePgBody.firstChild.remove();
+                    }
+                    if (
+                        DOM.activePgTitle.innerText === "Today" ||
+                        DOM.activePgTitle.innerText === "Tomorrow" ||
+                        DOM.activePgTitle.innerText === "This Week" ||
+                        DOM.activePgTitle.innerText === "Next Week" ||
+                        DOM.activePgTitle.innerText === "All Tasks"
+                        ) {
+                        for (const prop in projsAndTasks) {
+                            if (prop !== "Important") {
+                                projsAndTasks[prop].forEach(createTaskBasedOnNavClicked);
+                                function createTaskBasedOnNavClicked(currItem) {
+                                    if (
+                                        (DOM.activePgTitle.innerText === "Today" && isToday(parseISO(currItem.dueDate))) ||
+                                        (DOM.activePgTitle.innerText === "Tomorrow" && isTomorrow(parseISO(currItem.dueDate))) ||
+                                        (DOM.activePgTitle.innerText === "This Week" && isThisWeek(parseISO(currItem.dueDate))) ||
+                                        (DOM.activePgTitle.innerText === "Next Week" && isSameWeek(parseISO(currItem.dueDate), startOfNextWeek)) ||
+                                        DOM.activePgTitle.innerText === "All Tasks"
+                                        ) {
+                                        createTask(currItem);
                                     }
                                 }
                             }
-                        } else {
-                            projsAndTasks[DOM.activePgTitle.innerText].forEach(i => createTask(i));
                         }
+                    } else {
+                        projsAndTasks[DOM.activePgTitle.innerText].forEach(i => createTask(i));
+                    }
                 }
             }
         }

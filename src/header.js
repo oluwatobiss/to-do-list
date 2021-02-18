@@ -5,8 +5,8 @@ const headerAreaContent = (() => {
     logoIconEle.classList.add("fas", "fa-list-alt");
     const logoSpanEle = shared.createElement("span", [logoIconEle, " My Plans"]);
     const logoAnchorEle = shared.createElement("a", [logoSpanEle], {href: "#", id: "logo"});
-    const ulEle = shared.createElement("ul", null, {id: "nav-links"});
 
+    const ulEle = shared.createElement("ul", null, {id: "nav-links"});
     const menus = ["Today", "Tomorrow", "This Week", "Next Week", "All Tasks"];
     menus.forEach(createMenuLink);
     function createMenuLink(i) {
@@ -15,8 +15,8 @@ const headerAreaContent = (() => {
         liEle.append(anchorEle);
         ulEle.append(liEle);
     }
-
     const navEle = shared.createElement("nav", [ulEle]);
+    
     const headerEle = shared.createElement("header", [logoAnchorEle, navEle], {id: "main-header"});
     return headerEle;
 })();

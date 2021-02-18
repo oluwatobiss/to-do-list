@@ -1,4 +1,1 @@
-export default {
-    Important: [], 
-    Random: []
-};
+export default {};

@@ -2,11 +2,8 @@ import {DOM} from "./aggregator.js";
 
 export default function(objClicked) {
     if (objClicked.target === DOM.newProjModalBg || objClicked.target === DOM.closeProjModalBtn || objClicked.target === DOM.cancelProjBtn) {
-        closeProjModalBox();
-        function closeProjModalBox() {
-            DOM.modalBoxProjTitle.value = "";
-            DOM.newProjModalBg.style.display = "none";
-        }
+        DOM.modalBoxProjTitle.value = "";
+        DOM.newProjModalBg.style.display = "none";
     }
     if (objClicked.target === DOM.newTaskModalBg || objClicked.target === DOM.closeTaskModalBtn || objClicked.target === DOM.cancelTaskBtn) {
         DOM.modalBoxTaskTitle.value = "";

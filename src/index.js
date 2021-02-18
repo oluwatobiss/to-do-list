@@ -1,5 +1,5 @@
 import {
-    header, aside, mainEle, newProjModal, newTaskModal, createDefaultProjs, invokeListeners
+    header, aside, mainEle, newProjModal, newTaskModal, invokeListeners
 } from "./aggregator.js";
 
 const DOM = (() => {
@@ -44,5 +44,4 @@ const DOM = (() => {
 
 export default DOM;
 
-createDefaultProjs();
 invokeListeners();

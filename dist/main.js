@@ -2129,8 +2129,10 @@ let clickedProjIndex = null;
 
         for (let i = 0; i < _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards.length; i++) {
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[i].classList.remove("active-proj");
+            
             const projName = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[i].firstElementChild.innerText;
             const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
+
             if (projDiv.getAttribute("proj") === projNameConvert) {
                 const clickedProjCard = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[i];
                 clickedProjCard.classList.add("active-proj");
@@ -2164,11 +2166,14 @@ let clickedProjIndex = null;
             if (trashProjBtn.getAttribute("proj") === projNameConvert) {
                 const clickedProjCard = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[i];
                 const clickedProjName = clickedProjCard.querySelector(".proj-name").innerText;
+
                 _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedProjName].forEach(checkIfTaskIsImp);
                 _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.querySelector(`#${projNameConvert}-proj-opt`).remove();
                 delete _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedProjName];
                 clickedProjCard.remove();
+                localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
                 (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.displayNavTasks)("projDeleted");
+
                 function checkIfTaskIsImp(currItem) {
                     if (currItem.important) {
                         const tasksProjName = currItem.taskProj;
@@ -2220,7 +2225,6 @@ let clickedTaskIndex = null;
         const projOptsArr = Array.from(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.children);
         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.taskModalHeader.innerText = "New Task";
         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.addTaskBtn.innerText = "Add Task";
-
         // Pre-choose the project to which the new task should be added
         if (projOptsArr.some(i => i.value === _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText)) {
             const activePgProjOptIndex = projOptsArr.findIndex((i) => i.value === _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText);
@@ -2228,7 +2232,6 @@ let clickedTaskIndex = null;
         } else {
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.children[0].selected = true;
         }
-
         showNewTaskModal();
     }
 
@@ -2238,7 +2241,6 @@ let clickedTaskIndex = null;
         const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskproj");
         const clickedCardTask = clickedTaskCard.querySelector(".task");
         const clickedTaskTitle = clickedCardTask.innerText;
-
         // Toggle the task-done's class state and the taskDone property state
         clickedCardTask.classList.toggle("task-done");
         if (taskDoneChkBox.checked) {
@@ -2256,26 +2258,24 @@ let clickedTaskIndex = null;
                 }
             }
         }
+        localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
     }
 
     if (taskAndDueDateDiv) {
         getClickedTaskIndex(taskAndDueDateDiv);
         const clickedCardNote = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.taskCards[clickedTaskIndex].querySelector(".task-note");
-        if (clickedCardNote.style.display === "") {
-            clickedCardNote.style.display = "grid";
-        } else {
-            clickedCardNote.style.display = "";
-        }
+        (clickedCardNote.style.display === "") ? clickedCardNote.style.display = "grid"
+        : clickedCardNote.style.display = "";
     }
 
     if (starIcon) {
         getClickedTaskIndex(starIcon.closest("button"));
         const clickedTaskCard = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.taskCards[clickedTaskIndex];
+        console.log(clickedTaskCard);
         const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskproj");
         const clickedTaskTitle = clickedTaskCard.querySelector(".task").innerText;
 
         starIcon.classList.toggle("important-task");
-
         if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Important") {
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].forEach(changeImpToFalse);
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(delTaskFromImpProj);
@@ -2334,6 +2334,7 @@ let clickedTaskIndex = null;
                 document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.length;
             }
         }
+        localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
     }
 
     if (editTaskBtn) {
@@ -2363,12 +2364,14 @@ let clickedTaskIndex = null;
                 }
             }
         } else {
+            // Prefill Modal Box
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskTitle.value = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText][clickedTaskIndex].task;
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskNote.value = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText][clickedTaskIndex].note;
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskDate.value = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText][clickedTaskIndex].dueDate;
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskImportance.checked = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText][clickedTaskIndex].important;
         }
 
+        // Pre-choose the project to which the updated task should be added
         if (projOptsArr.some(i => i.value === clickedTaskProjName)) {
             const activePgProjOptIndex = projOptsArr.findIndex((i) => i.value === clickedTaskProjName);
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.children[activePgProjOptIndex].selected = true;
@@ -2404,10 +2407,10 @@ let clickedTaskIndex = null;
                 }
             } else {
                 // Delete the clicked task from the projsAndTasks object
-                _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].splice(clickedTaskIndex, 1);
                 if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName][clickedTaskIndex].important) {
                     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(delTaskFromImpProj);
                 }
+                _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].splice(clickedTaskIndex, 1);
             }
         }
 
@@ -2422,9 +2425,12 @@ let clickedTaskIndex = null;
             }
         }
 
+        localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
+
         // Update the displayed number of tasks in the deleted task's project
         document.querySelector(`.${clickedTaskProjNameConvert}-task-amt`).innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].length;
 
+        // Regenerate task cards
         while (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild) {
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild.remove();
         }
@@ -2506,6 +2512,8 @@ __webpack_require__.r(__webpack_exports__);
     } else {
         if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.createProjBtn.innerText === "Create Project" && !checkIfNameExist()) {
             Object.assign(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks, {[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxProjTitle.value]: []});
+            localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
+
             createProj(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxProjTitle.value);
             function createProj(projName) {
                 const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
@@ -2532,29 +2540,39 @@ __webpack_require__.r(__webpack_exports__);
             }
         } else if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.createProjBtn.innerText === "Update Project" && !checkIfNameExist()) {
             const currProjName = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedProjIndex].querySelector(".proj-name").innerText;
-            const currprojNameConvert = currProjName.toLowerCase().replace(/\W/g, "-");
+            const currProjNameConvert = currProjName.toLowerCase().replace(/\W/g, "-");
 
             const newProjName = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxProjTitle.value;
-            const newprojNameConvert = newProjName.toLowerCase().replace(/\W/g, "-");
+            const newProjNameConvert = newProjName.toLowerCase().replace(/\W/g, "-");
 
-            const projOptEle = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("option", [newProjName], {id: `${newprojNameConvert}-proj-opt`});
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.querySelector(`#${currprojNameConvert}-proj-opt`).replaceWith(projOptEle);
+            const projOptEle = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("option", [newProjName], {id: `${newProjNameConvert}-proj-opt`});
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.querySelector(`#${currProjNameConvert}-proj-opt`).replaceWith(projOptEle);
 
-            // Replace project name and attributes in the name span, amount span, edit button, and trash button
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedProjIndex].setAttribute("proj", newprojNameConvert);
+            // Replace the project name and attributes in the name span, amount span, edit button, and trash button
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedProjIndex].setAttribute("proj", newProjNameConvert);
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedProjIndex].querySelector(".proj-name").innerText = newProjName;
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedProjIndex].querySelector(".task-amt").classList.add(`${newprojNameConvert}-task-amt`);
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedProjIndex].querySelector(".task-amt").classList.remove(`${currprojNameConvert}-task-amt`);
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedProjIndex].querySelector(".edit-proj-btn").setAttribute("proj", newprojNameConvert);
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedProjIndex].querySelector(".trash-proj-btn").setAttribute("proj", newprojNameConvert);
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedProjIndex].querySelector(".task-amt").classList.add(`${newProjNameConvert}-task-amt`);
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedProjIndex].querySelector(".task-amt").classList.remove(`${currProjNameConvert}-task-amt`);
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedProjIndex].querySelector(".edit-proj-btn").setAttribute("proj", newProjNameConvert);
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedProjIndex].querySelector(".trash-proj-btn").setAttribute("proj", newProjNameConvert);
+
+            // Replace the project name in each task of the current project's array
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[currProjName].forEach(i => {
+                i.taskProj = newProjName;
+            });
 
             // Transfer the content of the old project object to the new project object and delete the old project object
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[newProjName] = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[currProjName];
             delete _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[currProjName];
+            localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
 
-            if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === currProjName) {
-                _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText = newProjName;
+            // Update content displayed onscreen
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText = newProjName;
+            while (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild) {
+                _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild.remove();
             }
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[newProjName].forEach(i => (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createTask)(i));
+
             closeProjModalBox();
         }
         
@@ -2618,6 +2636,7 @@ __webpack_require__.r(__webpack_exports__);
                     }
                     
                     document.querySelector(`.${projNameConvert}-task-amt`).innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[prop].length;
+                    localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
                     
                     if (
                         ((_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Today") && (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.isToday)((0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.parseISO)(taskInfo.dueDate))) ||
@@ -2651,21 +2670,18 @@ __webpack_require__.r(__webpack_exports__);
                         important: _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskImportance.checked
                     };
 
+                    console.log(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName]);
                     if (clickedTaskImportance === "true" && taskInfo.important === true) {
-                        console.log("Both are important!");
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(updateTask);
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].forEach(updateTask);
                     } else if (clickedTaskImportance === "true" && taskInfo.important === false) {
-                        console.log("Only clicked task is important!");
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(delTaskFromImpProj);
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].forEach(updateTask);
                     } else if (clickedTaskImportance === "false" && taskInfo.important === true) {
-                        console.log("Only updated task is important!");
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.push(taskInfo);
                         document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.length;
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].forEach(updateTask);
                     } else if (clickedTaskImportance === "false" && taskInfo.important === false) {
-                        console.log("None is important!");
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].forEach(updateTask);
                     }
 
@@ -2691,21 +2707,17 @@ __webpack_require__.r(__webpack_exports__);
                     if (clickedTaskProjName !== _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.value) {
                         // Move updated task to the selected project
                         if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === clickedTaskProjName) {
-                            console.log("Page title and clicked task's project are the same!");
                             const removedTask = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].splice(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.clickedTaskIndex, 1);
                             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.value].push(removedTask[0]);
                         } else {
-                            console.log("Page title and clicked task's project are different!");
                             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].forEach(relocateUpdatedTask);
                             function relocateUpdatedTask(currItem, currItemInd) {
                                 if (currItem.taskProj === _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.value && currItem.task === clickedTaskTitle) {
                                     const removedTask = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].splice(currItemInd, 1);
-                                    console.log(removedTask);
                                     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.value].push(removedTask[0]);
                                 }
                             }
                         }
-
 
                         // Update the clicked task's current project's task amount
                         const clickedTaskprojNameConvert = clickedTaskProjName.toLowerCase().replace(/\W/g, "-");
@@ -2715,39 +2727,40 @@ __webpack_require__.r(__webpack_exports__);
                         const projDropDownConvert = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.value.toLowerCase().replace(/\W/g, "-");
                         document.querySelector(`.${projDropDownConvert}-task-amt`).innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.value].length;
                     }
-                    
-                        // Regenerate task cards
-                        while (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild) {
-                            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild.remove();
-                        }
-    
-                        if (
-                            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Today" ||
-                            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Tomorrow" ||
-                            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "This Week" ||
-                            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Next Week" ||
-                            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "All Tasks"
-                            ) {
-                            for (const prop in _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks) {
-                                if (prop !== "Important") {
-                                    _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[prop].forEach(createTaskBasedOnNavClicked);
 
-                                    function createTaskBasedOnNavClicked(currItem) {
-                                        if (
-                                            (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Today" && (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.isToday)((0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.parseISO)(currItem.dueDate))) ||
-                                            (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Tomorrow" && (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.isTomorrow)((0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.parseISO)(currItem.dueDate))) ||
-                                            (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "This Week" && (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.isThisWeek)((0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.parseISO)(currItem.dueDate))) ||
-                                            (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Next Week" && (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.isSameWeek)((0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.parseISO)(currItem.dueDate), startOfNextWeek)) ||
-                                            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "All Tasks"
-                                            ) {
-                                            (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createTask)(currItem);
-                                        }
+                    localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
+                    
+                    // Regenerate task cards
+                    while (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild) {
+                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild.remove();
+                    }
+
+                    if (
+                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Today" ||
+                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Tomorrow" ||
+                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "This Week" ||
+                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Next Week" ||
+                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "All Tasks"
+                        ) {
+                        for (const prop in _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks) {
+                            if (prop !== "Important") {
+                                _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[prop].forEach(createTaskBasedOnNavClicked);
+                                function createTaskBasedOnNavClicked(currItem) {
+                                    if (
+                                        (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Today" && (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.isToday)((0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.parseISO)(currItem.dueDate))) ||
+                                        (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Tomorrow" && (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.isTomorrow)((0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.parseISO)(currItem.dueDate))) ||
+                                        (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "This Week" && (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.isThisWeek)((0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.parseISO)(currItem.dueDate))) ||
+                                        (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Next Week" && (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.isSameWeek)((0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.parseISO)(currItem.dueDate), startOfNextWeek)) ||
+                                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "All Tasks"
+                                        ) {
+                                        (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createTask)(currItem);
                                     }
                                 }
                             }
-                        } else {
-                            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText].forEach(i => (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createTask)(i));
                         }
+                    } else {
+                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText].forEach(i => (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createTask)(i));
+                    }
                 }
             }
         }
@@ -2776,26 +2789,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "newProjModal": () => /* reexport safe */ _new_proj_modal__WEBPACK_IMPORTED_MODULE_4__.default,
 /* harmony export */   "newTaskModal": () => /* reexport safe */ _new_task_modal__WEBPACK_IMPORTED_MODULE_5__.default,
 /* harmony export */   "DOM": () => /* reexport safe */ _index__WEBPACK_IMPORTED_MODULE_6__.default,
-/* harmony export */   "projsAndTasks": () => /* reexport safe */ _projs_and_tasks__WEBPACK_IMPORTED_MODULE_7__.default,
-/* harmony export */   "createDefaultProjs": () => /* reexport safe */ _default_projs_maker__WEBPACK_IMPORTED_MODULE_8__.default,
-/* harmony export */   "invokeListeners": () => /* reexport safe */ _listeners__WEBPACK_IMPORTED_MODULE_9__.default,
-/* harmony export */   "closeModal": () => /* reexport safe */ _close_modal__WEBPACK_IMPORTED_MODULE_10__.default,
-/* harmony export */   "displayNavTasks": () => /* reexport safe */ _display_nav_tasks__WEBPACK_IMPORTED_MODULE_11__.default,
-/* harmony export */   "createTask": () => /* reexport safe */ _create_task__WEBPACK_IMPORTED_MODULE_12__.default,
-/* harmony export */   "actOnClickedProjEle": () => /* reexport safe */ _act_on_clicked_proj_ele__WEBPACK_IMPORTED_MODULE_13__.default,
-/* harmony export */   "clickedProjIndex": () => /* reexport safe */ _act_on_clicked_proj_ele__WEBPACK_IMPORTED_MODULE_13__.clickedProjIndex,
-/* harmony export */   "addProjName": () => /* reexport safe */ _add_proj_name__WEBPACK_IMPORTED_MODULE_14__.default,
-/* harmony export */   "addTask": () => /* reexport safe */ _add_task__WEBPACK_IMPORTED_MODULE_15__.default,
-/* harmony export */   "actOnClickedTaskEle": () => /* reexport safe */ _act_on_clicked_task_ele__WEBPACK_IMPORTED_MODULE_16__.default,
-/* harmony export */   "clickedTaskIndex": () => /* reexport safe */ _act_on_clicked_task_ele__WEBPACK_IMPORTED_MODULE_16__.clickedTaskIndex,
-/* harmony export */   "isToday": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_17__.default,
-/* harmony export */   "isTomorrow": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_18__.default,
-/* harmony export */   "isThisWeek": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_19__.default,
-/* harmony export */   "startOfWeek": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_20__.default,
-/* harmony export */   "addDays": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_21__.default,
-/* harmony export */   "isSameWeek": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_22__.default,
-/* harmony export */   "formatDistance": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_23__.default,
-/* harmony export */   "parseISO": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_24__.default
+/* harmony export */   "invokeListeners": () => /* reexport safe */ _listeners__WEBPACK_IMPORTED_MODULE_7__.default,
+/* harmony export */   "closeModal": () => /* reexport safe */ _close_modal__WEBPACK_IMPORTED_MODULE_8__.default,
+/* harmony export */   "displayNavTasks": () => /* reexport safe */ _display_nav_tasks__WEBPACK_IMPORTED_MODULE_9__.default,
+/* harmony export */   "projsAndTasks": () => /* reexport safe */ _projs_and_tasks__WEBPACK_IMPORTED_MODULE_10__.default,
+/* harmony export */   "createTask": () => /* reexport safe */ _create_task__WEBPACK_IMPORTED_MODULE_11__.default,
+/* harmony export */   "actOnClickedProjEle": () => /* reexport safe */ _act_on_clicked_proj_ele__WEBPACK_IMPORTED_MODULE_12__.default,
+/* harmony export */   "clickedProjIndex": () => /* reexport safe */ _act_on_clicked_proj_ele__WEBPACK_IMPORTED_MODULE_12__.clickedProjIndex,
+/* harmony export */   "addProjName": () => /* reexport safe */ _add_proj_name__WEBPACK_IMPORTED_MODULE_13__.default,
+/* harmony export */   "addTask": () => /* reexport safe */ _add_task__WEBPACK_IMPORTED_MODULE_14__.default,
+/* harmony export */   "actOnClickedTaskEle": () => /* reexport safe */ _act_on_clicked_task_ele__WEBPACK_IMPORTED_MODULE_15__.default,
+/* harmony export */   "clickedTaskIndex": () => /* reexport safe */ _act_on_clicked_task_ele__WEBPACK_IMPORTED_MODULE_15__.clickedTaskIndex,
+/* harmony export */   "isToday": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_16__.default,
+/* harmony export */   "isTomorrow": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_17__.default,
+/* harmony export */   "isThisWeek": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_18__.default,
+/* harmony export */   "startOfWeek": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_19__.default,
+/* harmony export */   "addDays": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_20__.default,
+/* harmony export */   "isSameWeek": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_21__.default,
+/* harmony export */   "formatDistance": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_22__.default,
+/* harmony export */   "parseISO": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_23__.default
 /* harmony export */ });
 /* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./shared */ "./src/shared.js");
 /* harmony import */ var _header__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./header */ "./src/header.js");
@@ -2804,25 +2816,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _new_proj_modal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./new-proj-modal */ "./src/new-proj-modal.js");
 /* harmony import */ var _new_task_modal__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./new-task-modal */ "./src/new-task-modal.js");
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./index */ "./src/index.js");
-/* harmony import */ var _projs_and_tasks__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./projs-and-tasks */ "./src/projs-and-tasks.js");
-/* harmony import */ var _default_projs_maker__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./default-projs-maker */ "./src/default-projs-maker.js");
-/* harmony import */ var _listeners__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./listeners */ "./src/listeners.js");
-/* harmony import */ var _close_modal__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./close-modal */ "./src/close-modal.js");
-/* harmony import */ var _display_nav_tasks__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./display-nav-tasks */ "./src/display-nav-tasks.js");
-/* harmony import */ var _create_task__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./create-task */ "./src/create-task.js");
-/* harmony import */ var _act_on_clicked_proj_ele__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./act-on-clicked-proj-ele */ "./src/act-on-clicked-proj-ele.js");
-/* harmony import */ var _add_proj_name__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./add-proj-name */ "./src/add-proj-name.js");
-/* harmony import */ var _add_task__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./add-task */ "./src/add-task.js");
-/* harmony import */ var _act_on_clicked_task_ele__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./act-on-clicked-task-ele */ "./src/act-on-clicked-task-ele.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isToday/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isTomorrow/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isThisWeek/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/startOfWeek/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/addDays/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isSameWeek/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/formatDistance/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/parseISO/index.js");
-
+/* harmony import */ var _listeners__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./listeners */ "./src/listeners.js");
+/* harmony import */ var _close_modal__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./close-modal */ "./src/close-modal.js");
+/* harmony import */ var _display_nav_tasks__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./display-nav-tasks */ "./src/display-nav-tasks.js");
+/* harmony import */ var _projs_and_tasks__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./projs-and-tasks */ "./src/projs-and-tasks.js");
+/* harmony import */ var _create_task__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./create-task */ "./src/create-task.js");
+/* harmony import */ var _act_on_clicked_proj_ele__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./act-on-clicked-proj-ele */ "./src/act-on-clicked-proj-ele.js");
+/* harmony import */ var _add_proj_name__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./add-proj-name */ "./src/add-proj-name.js");
+/* harmony import */ var _add_task__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./add-task */ "./src/add-task.js");
+/* harmony import */ var _act_on_clicked_task_ele__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./act-on-clicked-task-ele */ "./src/act-on-clicked-task-ele.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isToday/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isTomorrow/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isThisWeek/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/startOfWeek/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/addDays/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isSameWeek/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/formatDistance/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/parseISO/index.js");
 
 
 
@@ -2861,11 +2871,13 @@ __webpack_require__.r(__webpack_exports__);
 const asideAreaContent = (() => {
     const newProjBtn = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("button", ["New Project"], {type: "button", id: "new-proj-btn"});
     const projListDiv = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("div", null, {id: "proj-list"});
+
     const footerIconEle = document.createElement("i");
     footerIconEle.classList.add("fas", "fa-arrow-alt-circle-right");
     const footerAnchorEle = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("a", ["Created by Oluwatobi Sofela ", footerIconEle], {href: "https://www.codesweetly.com/", target: "_blank"});
     const footerEle = document.createElement("footer");
     footerEle.append(footerAnchorEle);
+
     const asideEle = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("aside", [newProjBtn, projListDiv, footerEle], {id: "aside-ele"});
     return asideEle;
 })();
@@ -2889,11 +2901,8 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(objClicked) {
     if (objClicked.target === _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.newProjModalBg || objClicked.target === _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.closeProjModalBtn || objClicked.target === _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.cancelProjBtn) {
-        closeProjModalBox();
-        function closeProjModalBox() {
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxProjTitle.value = "";
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.newProjModalBg.style.display = "none";
-        }
+        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxProjTitle.value = "";
+        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.newProjModalBg.style.display = "none";
     }
     if (objClicked.target === _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.newTaskModalBg || objClicked.target === _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.closeTaskModalBtn || objClicked.target === _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.cancelTaskBtn) {
         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskTitle.value = "";
@@ -2976,42 +2985,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./src/default-projs-maker.js":
-/*!************************************!*\
-  !*** ./src/default-projs-maker.js ***!
-  \************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => /* export default binding */ __WEBPACK_DEFAULT_EXPORT__
-/* harmony export */ });
-/* harmony import */ var _aggregator_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./aggregator.js */ "./src/aggregator.js");
-
-
-// Create Important and Random projects as the two default projects
-/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
-    for (const prop in _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks) {
-        if (prop === "Important" || prop === "Random") {
-            const projNameConvert = prop.toLowerCase().replace(/\W/g, "-");
-            const projNameSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [prop], {class: "proj-name"});
-    
-            const taskAmtSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[prop].length]);
-            taskAmtSpan.classList.add("task-amt", `${projNameConvert}-task-amt`);
-            
-            const projDiv = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("div", [projNameSpan, taskAmtSpan], {class: "proj", proj: projNameConvert});
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projListDiv.append(projDiv);
-
-            if (prop !== "Important") {
-                const projOptEle = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("option", [prop]);
-                _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.append(projOptEle);
-            }
-        }
-    }
-};
-
-/***/ }),
-
 /***/ "./src/display-nav-tasks.js":
 /*!**********************************!*\
   !*** ./src/display-nav-tasks.js ***!
@@ -3039,10 +3012,67 @@ __webpack_require__.r(__webpack_exports__);
         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[i].classList.remove("active-proj");
     }
 
-    (event === "windowLoaded" || event === "logoClicked" || event === "projDeleted") ?
-        clickedNavLink = "Today"
-    :   clickedNavLink = this.querySelector(".nav-link").innerText;
+    if (event === "windowLoaded" || event === "logoClicked" || event === "projDeleted") {
+        clickedNavLink = "Today";
+        let projects = null;
+        if (event === "windowLoaded" && !localStorage.getItem("myPlans")) {
+            projects = ["Important", "Random"];
+            createProjCards();
+        } else if (event === "windowLoaded" && localStorage.getItem("myPlans")) {
+            const projsFromLocStor = localStorage.getItem("myPlans");
+            const turnJSONObjToJSObj = JSON.parse(projsFromLocStor);
+            Object.assign(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks, turnJSONObjToJSObj);
 
+            const locStorProjNames = ["Important", "Random"];
+            for (const prop in turnJSONObjToJSObj) {
+                if (prop !== "Important" && prop !== "Random") {
+                    locStorProjNames.push(prop);
+                }
+            }
+            projects = locStorProjNames;
+            createProjCards();
+        }
+
+        function createProjCards() {
+            for (const val of projects) {                
+                const projNameConvert = val.toLowerCase().replace(/\W/g, "-");
+                const projNameSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [val], {class: "proj-name"});
+
+                let taskAmtSpan = null;
+                if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[val]) {
+                    taskAmtSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[val].length]);
+                } else {
+                    Object.assign(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks, {[val]: []});
+                    localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
+                    taskAmtSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[val].length]);
+                }
+                taskAmtSpan.classList.add("task-amt", `${projNameConvert}-task-amt`);
+
+                const editIcon = document.createElement("i");
+                editIcon.classList.add("fas", "fa-pen");
+                const editBtn = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("button", [editIcon], {class: "edit-proj-btn", proj: projNameConvert});
+            
+                const deleteIcon = document.createElement("i");
+                deleteIcon.classList.add("fas", "fa-trash");
+                const deleteBtn = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("button", [deleteIcon], {class: "trash-proj-btn", proj: projNameConvert});
+                
+                let projDiv = null;
+                (val === "Important" || val === "Random") ?
+                    projDiv = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("div", [projNameSpan, taskAmtSpan], {class: "proj", proj: projNameConvert})
+                :   projDiv = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("div", [projNameSpan, taskAmtSpan, editBtn, deleteBtn], {class: "proj", proj: projNameConvert});
+                _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projListDiv.append(projDiv);
+        
+                if (val !== "Important") {
+                    const projOptEle = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("option", [val], {id: `${projNameConvert}-proj-opt`});
+                    _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.append(projOptEle);
+                }
+            }
+        }
+    } else {
+        clickedNavLink = this.querySelector(".nav-link").innerText;
+    }
+
+    // Populate the page with the appropraite nav-link's content
     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText = clickedNavLink;
 
     while (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild) {
@@ -3135,8 +3165,8 @@ const headerAreaContent = (() => {
     logoIconEle.classList.add("fas", "fa-list-alt");
     const logoSpanEle = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [logoIconEle, " My Plans"]);
     const logoAnchorEle = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("a", [logoSpanEle], {href: "#", id: "logo"});
-    const ulEle = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("ul", null, {id: "nav-links"});
 
+    const ulEle = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("ul", null, {id: "nav-links"});
     const menus = ["Today", "Tomorrow", "This Week", "Next Week", "All Tasks"];
     menus.forEach(createMenuLink);
     function createMenuLink(i) {
@@ -3145,8 +3175,8 @@ const headerAreaContent = (() => {
         liEle.append(anchorEle);
         ulEle.append(liEle);
     }
-
     const navEle = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("nav", [ulEle]);
+    
     const headerEle = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("header", [logoAnchorEle, navEle], {id: "main-header"});
     return headerEle;
 })();
@@ -3210,7 +3240,6 @@ const DOM = (() => {
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DOM);
 
-(0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createDefaultProjs)();
 (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.invokeListeners)();
 
 /***/ }),
@@ -3231,7 +3260,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
     window.addEventListener("click", _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.closeModal);
     window.addEventListener("load", () => (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.displayNavTasks)("windowLoaded"));
-    _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.logo.addEventListener("click", () => (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.displayNavTasks)("logoClicked"))
+    _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.logo.addEventListener("click", () => (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.displayNavTasks)("logoClicked"));
     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.navLinks.forEach(i => i.addEventListener("click", _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.displayNavTasks));
     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.asideEleNode.addEventListener("click", _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.actOnClickedProjEle);
     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.createProjBtn.addEventListener("click", _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.addProjName);
@@ -3374,10 +3403,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-    Important: [], 
-    Random: []
-});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({});
 
 /***/ }),
 

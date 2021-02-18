@@ -20,8 +20,10 @@ export default function(objClicked) {
 
         for (let i = 0; i < DOM.projCards.length; i++) {
             DOM.projCards[i].classList.remove("active-proj");
+            
             const projName = DOM.projCards[i].firstElementChild.innerText;
             const projNameConvert = projName.toLowerCase().replace(/\W/g, "-");
+
             if (projDiv.getAttribute("proj") === projNameConvert) {
                 const clickedProjCard = DOM.projCards[i];
                 clickedProjCard.classList.add("active-proj");
@@ -55,11 +57,14 @@ export default function(objClicked) {
             if (trashProjBtn.getAttribute("proj") === projNameConvert) {
                 const clickedProjCard = DOM.projCards[i];
                 const clickedProjName = clickedProjCard.querySelector(".proj-name").innerText;
+
                 projsAndTasks[clickedProjName].forEach(checkIfTaskIsImp);
                 DOM.projDropDown.querySelector(`#${projNameConvert}-proj-opt`).remove();
                 delete projsAndTasks[clickedProjName];
                 clickedProjCard.remove();
+                localStorage.setItem("myPlans", JSON.stringify(projsAndTasks));
                 displayNavTasks("projDeleted");
+
                 function checkIfTaskIsImp(currItem) {
                     if (currItem.important) {
                         const tasksProjName = currItem.taskProj;

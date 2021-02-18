@@ -48,6 +48,7 @@ export default function(objClicked) {
                 }
             }
         }
+        localStorage.setItem("myPlans", JSON.stringify(projsAndTasks));
     }
 
     if (taskAndDueDateDiv) {
@@ -122,6 +123,7 @@ export default function(objClicked) {
                 document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
             }
         }
+        localStorage.setItem("myPlans", JSON.stringify(projsAndTasks));
     }
 
     if (editTaskBtn) {
@@ -157,13 +159,11 @@ export default function(objClicked) {
             DOM.modalBoxTaskDate.value = projsAndTasks[DOM.activePgTitle.innerText][clickedTaskIndex].dueDate;
             DOM.modalBoxTaskImportance.checked = projsAndTasks[DOM.activePgTitle.innerText][clickedTaskIndex].important;
         }
-
         // Pre-choose the project to which the updated task should be added
         if (projOptsArr.some(i => i.value === clickedTaskProjName)) {
             const activePgProjOptIndex = projOptsArr.findIndex((i) => i.value === clickedTaskProjName);
             DOM.projDropDown.children[activePgProjOptIndex].selected = true;
         }
-
         showNewTaskModal();
     }
 
@@ -194,10 +194,10 @@ export default function(objClicked) {
                 }
             } else {
                 // Delete the clicked task from the projsAndTasks object
-                projsAndTasks[clickedTaskProjName].splice(clickedTaskIndex, 1);
                 if (projsAndTasks[clickedTaskProjName][clickedTaskIndex].important) {
                     projsAndTasks.Important.forEach(delTaskFromImpProj);
                 }
+                projsAndTasks[clickedTaskProjName].splice(clickedTaskIndex, 1);
             }
         }
 
@@ -212,14 +212,17 @@ export default function(objClicked) {
             }
         }
 
+        // Update the localStorage
+        localStorage.setItem("myPlans", JSON.stringify(projsAndTasks));
+
         // Update the displayed number of tasks in the deleted task's project
         document.querySelector(`.${clickedTaskProjNameConvert}-task-amt`).innerText = projsAndTasks[clickedTaskProjName].length;
 
-        // Regenerate task cards
+        // Update the content displayed onscreen
         while (DOM.activePgBody.firstChild) {
             DOM.activePgBody.firstChild.remove();
         }
-
+        
         if (DOM.activePgTitle.innerText === "Important") {
             projsAndTasks.Important.forEach(i => createTask(i));
         } else if (

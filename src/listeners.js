@@ -5,7 +5,7 @@ import {
 export default function() {
     window.addEventListener("click", closeModal);
     window.addEventListener("load", () => displayNavTasks("windowLoaded"));
-    DOM.logo.addEventListener("click", () => displayNavTasks("logoClicked"))
+    DOM.logo.addEventListener("click", () => displayNavTasks("logoClicked"));
     DOM.navLinks.forEach(i => i.addEventListener("click", displayNavTasks));
     DOM.asideEleNode.addEventListener("click", actOnClickedProjEle);
     DOM.createProjBtn.addEventListener("click", addProjName);
