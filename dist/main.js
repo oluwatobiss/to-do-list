@@ -2136,11 +2136,13 @@ let clickedProjIndex = null;
             if (projDiv.getAttribute("proj") === projNameConvert) {
                 const clickedProjCard = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projCards[i];
                 clickedProjCard.classList.add("active-proj");
+
                 _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText = projName;
                 while (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild) {
                     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild.remove();
                 }
-                _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[projName].forEach(i => (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createTask)(i));
+                (projName === "Important") ? (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createImportantTasks)()
+                : _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[projName].forEach(i => (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createTask)(i));
             }
         }
     }
@@ -2176,15 +2178,8 @@ let clickedProjIndex = null;
 
                 function checkIfTaskIsImp(currItem) {
                     if (currItem.important) {
-                        const tasksProjName = currItem.taskProj;
-                        const taskTitle = currItem.task;
-                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(delTaskFromImpProj);
-                        function delTaskFromImpProj(currItem, currItemInd) {
-                            if (currItem.taskProj === tasksProjName && currItem.task === taskTitle) {
-                                _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.splice(currItemInd, 1);
-                                document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.length;
-                            }
-                        }
+                        --_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
+                        document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
                     }
                 }
             }
@@ -2271,18 +2266,18 @@ let clickedTaskIndex = null;
     if (starIcon) {
         getClickedTaskIndex(starIcon.closest("button"));
         const clickedTaskCard = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.taskCards[clickedTaskIndex];
-        console.log(clickedTaskCard);
         const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskproj");
         const clickedTaskTitle = clickedTaskCard.querySelector(".task").innerText;
 
         starIcon.classList.toggle("important-task");
         if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Important") {
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].forEach(changeImpToFalse);
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(delTaskFromImpProj);
-            while (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild) {
-                _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild.remove();
-            }
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(i => (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createTask)(i));
+            --_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
+            document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
+
+            while (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild) {_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild.remove();}
+            (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createImportantTasks)();
+
             function changeImpToFalse(currItem, currItemInd) {
                 if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
                     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName][currItemInd].important = false;
@@ -2305,12 +2300,13 @@ let clickedTaskIndex = null;
                         if (currItem.important) {
                             currItem.important = false;
                             clickedTaskCard.querySelector(".important-btn").setAttribute("important", false);
-                            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(delTaskFromImpProj);
+                            --_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
+                            document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
                         } else {
                             currItem.important = true;
                             clickedTaskCard.querySelector(".important-btn").setAttribute("important", true);
-                            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.push(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName][currItemInd]);
-                            document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.length;
+                            ++_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
+                            document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
                         }
                     }
                 }
@@ -2318,20 +2314,14 @@ let clickedTaskIndex = null;
                 if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName][clickedTaskIndex].important) {
                     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName][clickedTaskIndex].important = false;
                     clickedTaskCard.querySelector(".important-btn").setAttribute("important", false);
-                    _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(delTaskFromImpProj);
+                    --_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
+                    document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
                 } else {
                     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName][clickedTaskIndex].important = true;
                     clickedTaskCard.querySelector(".important-btn").setAttribute("important", true);
-                    _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.push(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName][clickedTaskIndex]);
-                    document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.length;
+                    ++_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
+                    document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
                 }
-            }
-        }
-
-        function delTaskFromImpProj(currItem, currItemInd) {
-            if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
-                _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.splice(currItemInd, 1);
-                document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.length;
             }
         }
         localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
@@ -2348,6 +2338,7 @@ let clickedTaskIndex = null;
         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.addTaskBtn.innerText = "Update Task";
 
         if (
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Important" ||
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Today" ||
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Tomorrow" ||
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "This Week" ||
@@ -2365,18 +2356,17 @@ let clickedTaskIndex = null;
             }
         } else {
             // Prefill Modal Box
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskTitle.value = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText][clickedTaskIndex].task;
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskNote.value = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText][clickedTaskIndex].note;
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskDate.value = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText][clickedTaskIndex].dueDate;
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskImportance.checked = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText][clickedTaskIndex].important;
+            const clickedTaskObj = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText][clickedTaskIndex];
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskTitle.value = clickedTaskObj.task;
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskNote.value = clickedTaskObj.note;
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskDate.value = clickedTaskObj.dueDate;
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskImportance.checked = clickedTaskObj.important;
         }
-
         // Pre-choose the project to which the updated task should be added
         if (projOptsArr.some(i => i.value === clickedTaskProjName)) {
             const activePgProjOptIndex = projOptsArr.findIndex((i) => i.value === clickedTaskProjName);
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.children[activePgProjOptIndex].selected = true;
         }
-
         showNewTaskModal();
     }
 
@@ -2401,22 +2391,24 @@ let clickedTaskIndex = null;
                     if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].splice(i, 1);
                         if (currItem.important) {
-                            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(delTaskFromImpProj);
+                            delTaskFromImpProj();
                         }
                     }
                 }
             } else {
-                // Delete the clicked task from the projsAndTasks object
+                // If the clicked task is important, delete it from the important projects
                 if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName][clickedTaskIndex].important) {
-                    _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(delTaskFromImpProj);
+                    delTaskFromImpProj();
                 }
+                // Delete the clicked task from the projsAndTasks object
                 _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].splice(clickedTaskIndex, 1);
             }
         }
 
         if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Important") {
+            // Delete task from the important projects
+            delTaskFromImpProj();
             // Find the clicked task in the projsAndTasks object and delete it
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(delTaskFromImpProj);
             for (let i = 0; i < _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].length; i++) {
                 const currItem = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName][i];
                 if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
@@ -2425,18 +2417,14 @@ let clickedTaskIndex = null;
             }
         }
 
+        // Update the localStorage
         localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
-
         // Update the displayed number of tasks in the deleted task's project
         document.querySelector(`.${clickedTaskProjNameConvert}-task-amt`).innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].length;
-
-        // Regenerate task cards
-        while (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild) {
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild.remove();
-        }
-
+        // Update the content displayed onscreen
+        while (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild) {_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild.remove();}
         if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Important") {
-            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(i => (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createTask)(i));
+            (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createImportantTasks)();
         } else if (
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Today" ||
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Tomorrow" ||
@@ -2467,12 +2455,10 @@ let clickedTaskIndex = null;
         } else {
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].forEach(i => (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createTask)(i));
         }
-            
-        function delTaskFromImpProj(currItem, currItemInd) {
-            if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
-                _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.splice(currItemInd, 1);
-                document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.length;
-            }
+
+        function delTaskFromImpProj() {
+            --_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
+            document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
         }
     }
 
@@ -2564,9 +2550,9 @@ __webpack_require__.r(__webpack_exports__);
             // Transfer the content of the old project object to the new project object and delete the old project object
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[newProjName] = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[currProjName];
             delete _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[currProjName];
-            localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
 
-            // Update content displayed onscreen
+            // Update the localStorage and the content displayed onscreen
+            localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText = newProjName;
             while (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild) {
                 _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild.remove();
@@ -2575,7 +2561,7 @@ __webpack_require__.r(__webpack_exports__);
 
             closeProjModalBox();
         }
-        
+
         function checkIfNameExist() {
             for (const prop in _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks) {
                 if (prop.toLowerCase() === _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxProjTitle.value.toLowerCase().trim()) {
@@ -2584,7 +2570,7 @@ __webpack_require__.r(__webpack_exports__);
                 }
             }
         }
-
+        
         function closeProjModalBox() {
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxProjTitle.value = "";
             _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.newProjModalBg.style.display = "none";
@@ -2631,8 +2617,8 @@ __webpack_require__.r(__webpack_exports__);
                     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[prop].push(taskInfo);
 
                     if (taskInfo.important) {
-                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.push(taskInfo);
-                        document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.length;
+                        ++_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
+                        document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
                     }
                     
                     document.querySelector(`.${projNameConvert}-task-amt`).innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[prop].length;
@@ -2670,16 +2656,15 @@ __webpack_require__.r(__webpack_exports__);
                         important: _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskImportance.checked
                     };
 
-                    console.log(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName]);
                     if (clickedTaskImportance === "true" && taskInfo.important === true) {
-                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(updateTask);
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].forEach(updateTask);
                     } else if (clickedTaskImportance === "true" && taskInfo.important === false) {
-                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.forEach(delTaskFromImpProj);
+                        --_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
+                        document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].forEach(updateTask);
                     } else if (clickedTaskImportance === "false" && taskInfo.important === true) {
-                        _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.push(taskInfo);
-                        document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.length;
+                        ++_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
+                        document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important;
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].forEach(updateTask);
                     } else if (clickedTaskImportance === "false" && taskInfo.important === false) {
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[clickedTaskProjName].forEach(updateTask);
@@ -2695,14 +2680,6 @@ __webpack_require__.r(__webpack_exports__);
                             currItem.important = taskInfo.important;
                         }
                     }
-
-                    function delTaskFromImpProj(currItem, currItemInd) {
-                        if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
-                            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.splice(currItemInd, 1);
-                            document.querySelector(".important-task-amt").innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks.Important.length;
-                        }
-                    }
-
                     // If the clicked task's project name is different from the selected project
                     if (clickedTaskProjName !== _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.value) {
                         // Move updated task to the selected project
@@ -2728,13 +2705,11 @@ __webpack_require__.r(__webpack_exports__);
                         document.querySelector(`.${projDropDownConvert}-task-amt`).innerText = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.projDropDown.value].length;
                     }
 
+                    // Update the localStorage and the content displayed onscreen
                     localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
-                    
-                    // Regenerate task cards
                     while (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild) {
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgBody.firstChild.remove();
                     }
-
                     if (
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Today" ||
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Tomorrow" ||
@@ -2758,6 +2733,8 @@ __webpack_require__.r(__webpack_exports__);
                                 }
                             }
                         }
+                    } else if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText === "Important") {
+                        (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createImportantTasks)();
                     } else {
                         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.activePgTitle.innerText].forEach(i => (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createTask)(i));
                     }
@@ -2794,20 +2771,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "displayNavTasks": () => /* reexport safe */ _display_nav_tasks__WEBPACK_IMPORTED_MODULE_9__.default,
 /* harmony export */   "projsAndTasks": () => /* reexport safe */ _projs_and_tasks__WEBPACK_IMPORTED_MODULE_10__.default,
 /* harmony export */   "createTask": () => /* reexport safe */ _create_task__WEBPACK_IMPORTED_MODULE_11__.default,
-/* harmony export */   "actOnClickedProjEle": () => /* reexport safe */ _act_on_clicked_proj_ele__WEBPACK_IMPORTED_MODULE_12__.default,
-/* harmony export */   "clickedProjIndex": () => /* reexport safe */ _act_on_clicked_proj_ele__WEBPACK_IMPORTED_MODULE_12__.clickedProjIndex,
-/* harmony export */   "addProjName": () => /* reexport safe */ _add_proj_name__WEBPACK_IMPORTED_MODULE_13__.default,
-/* harmony export */   "addTask": () => /* reexport safe */ _add_task__WEBPACK_IMPORTED_MODULE_14__.default,
+/* harmony export */   "createImportantTasks": () => /* reexport safe */ _create_imp_tasks__WEBPACK_IMPORTED_MODULE_12__.default,
+/* harmony export */   "actOnClickedProjEle": () => /* reexport safe */ _act_on_clicked_proj_ele__WEBPACK_IMPORTED_MODULE_13__.default,
+/* harmony export */   "clickedProjIndex": () => /* reexport safe */ _act_on_clicked_proj_ele__WEBPACK_IMPORTED_MODULE_13__.clickedProjIndex,
+/* harmony export */   "addProjName": () => /* reexport safe */ _add_proj_name__WEBPACK_IMPORTED_MODULE_14__.default,
 /* harmony export */   "actOnClickedTaskEle": () => /* reexport safe */ _act_on_clicked_task_ele__WEBPACK_IMPORTED_MODULE_15__.default,
 /* harmony export */   "clickedTaskIndex": () => /* reexport safe */ _act_on_clicked_task_ele__WEBPACK_IMPORTED_MODULE_15__.clickedTaskIndex,
-/* harmony export */   "isToday": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_16__.default,
-/* harmony export */   "isTomorrow": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_17__.default,
-/* harmony export */   "isThisWeek": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_18__.default,
-/* harmony export */   "startOfWeek": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_19__.default,
-/* harmony export */   "addDays": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_20__.default,
-/* harmony export */   "isSameWeek": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_21__.default,
-/* harmony export */   "formatDistance": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_22__.default,
-/* harmony export */   "parseISO": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_23__.default
+/* harmony export */   "addTask": () => /* reexport safe */ _add_task__WEBPACK_IMPORTED_MODULE_16__.default,
+/* harmony export */   "isToday": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_17__.default,
+/* harmony export */   "isTomorrow": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_18__.default,
+/* harmony export */   "isThisWeek": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_19__.default,
+/* harmony export */   "startOfWeek": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_20__.default,
+/* harmony export */   "addDays": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_21__.default,
+/* harmony export */   "isSameWeek": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_22__.default,
+/* harmony export */   "formatDistance": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_23__.default,
+/* harmony export */   "parseISO": () => /* reexport safe */ date_fns__WEBPACK_IMPORTED_MODULE_24__.default
 /* harmony export */ });
 /* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./shared */ "./src/shared.js");
 /* harmony import */ var _header__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./header */ "./src/header.js");
@@ -2821,18 +2799,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _display_nav_tasks__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./display-nav-tasks */ "./src/display-nav-tasks.js");
 /* harmony import */ var _projs_and_tasks__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./projs-and-tasks */ "./src/projs-and-tasks.js");
 /* harmony import */ var _create_task__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./create-task */ "./src/create-task.js");
-/* harmony import */ var _act_on_clicked_proj_ele__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./act-on-clicked-proj-ele */ "./src/act-on-clicked-proj-ele.js");
-/* harmony import */ var _add_proj_name__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./add-proj-name */ "./src/add-proj-name.js");
-/* harmony import */ var _add_task__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./add-task */ "./src/add-task.js");
+/* harmony import */ var _create_imp_tasks__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./create-imp-tasks */ "./src/create-imp-tasks.js");
+/* harmony import */ var _act_on_clicked_proj_ele__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./act-on-clicked-proj-ele */ "./src/act-on-clicked-proj-ele.js");
+/* harmony import */ var _add_proj_name__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./add-proj-name */ "./src/add-proj-name.js");
 /* harmony import */ var _act_on_clicked_task_ele__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./act-on-clicked-task-ele */ "./src/act-on-clicked-task-ele.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isToday/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isTomorrow/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isThisWeek/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/startOfWeek/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/addDays/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isSameWeek/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/formatDistance/index.js");
-/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/parseISO/index.js");
+/* harmony import */ var _add_task__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./add-task */ "./src/add-task.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isToday/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isTomorrow/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isThisWeek/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/startOfWeek/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/addDays/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/isSameWeek/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/formatDistance/index.js");
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/parseISO/index.js");
+
 
 
 
@@ -2911,6 +2891,34 @@ __webpack_require__.r(__webpack_exports__);
         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.modalBoxTaskImportance.checked = false;
         _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.newTaskModalBg.style.display = "none";
     }
+}
+
+/***/ }),
+
+/***/ "./src/create-imp-tasks.js":
+/*!*********************************!*\
+  !*** ./src/create-imp-tasks.js ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => /* export default binding */ __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */ });
+/* harmony import */ var _aggregator_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./aggregator.js */ "./src/aggregator.js");
+
+
+/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
+    for (const prop in _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks) {
+        if (prop !== "Important") {
+            _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[prop].forEach(createTaskBasedOnImportancy);
+            function createTaskBasedOnImportancy(currItem) {
+                if (currItem.important) {
+                    (0,_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.createTask)(currItem);
+                }
+            }
+        }
+    }   
 }
 
 /***/ }),
@@ -3039,12 +3047,21 @@ __webpack_require__.r(__webpack_exports__);
                 const projNameSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [val], {class: "proj-name"});
 
                 let taskAmtSpan = null;
+                // If val exist in projsAndTasks, just initilize taskAmtSpan. Otherwise,
+                // first assign a val property to projsAndTasks; then, initilize taskAmtSpan.
                 if (_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[val]) {
-                    taskAmtSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[val].length]);
+                    (val === "Important") ?
+                        taskAmtSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[val]])
+                    :   taskAmtSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[val].length]);
                 } else {
-                    Object.assign(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks, {[val]: []});
+                    if (val === "Important") {
+                        Object.assign(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks, {[val]: 0});
+                        taskAmtSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[val]]);
+                    } else {
+                        Object.assign(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks, {[val]: []});
+                        taskAmtSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[val].length]);
+                    }
                     localStorage.setItem("myPlans", JSON.stringify(_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks));
-                    taskAmtSpan = _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.shared.createElement("span", [_aggregator_js__WEBPACK_IMPORTED_MODULE_0__.projsAndTasks[val].length]);
                 }
                 taskAmtSpan.classList.add("task-amt", `${projNameConvert}-task-amt`);
 
@@ -3264,8 +3281,8 @@ __webpack_require__.r(__webpack_exports__);
     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.navLinks.forEach(i => i.addEventListener("click", _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.displayNavTasks));
     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.asideEleNode.addEventListener("click", _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.actOnClickedProjEle);
     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.createProjBtn.addEventListener("click", _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.addProjName);
-    _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.addTaskBtn.addEventListener("click", _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.addTask);
     _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.mainEleNode.addEventListener("click", _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.actOnClickedTaskEle);
+    _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.DOM.addTaskBtn.addEventListener("click", _aggregator_js__WEBPACK_IMPORTED_MODULE_0__.addTask);
 };
 
 /***/ }),

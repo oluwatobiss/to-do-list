@@ -69,7 +69,7 @@ export default function() {
 
             closeProjModalBox();
         }
-        
+
         function checkIfNameExist() {
             for (const prop in projsAndTasks) {
                 if (prop.toLowerCase() === DOM.modalBoxProjTitle.value.toLowerCase().trim()) {
@@ -78,7 +78,7 @@ export default function() {
                 }
             }
         }
-
+        
         function closeProjModalBox() {
             DOM.modalBoxProjTitle.value = "";
             DOM.newProjModalBg.style.display = "none";

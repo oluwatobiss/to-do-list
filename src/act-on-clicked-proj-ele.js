@@ -1,4 +1,4 @@
-import {DOM, displayNavTasks, projsAndTasks, createTask} from "./aggregator.js";
+import {DOM, displayNavTasks, projsAndTasks, createTask, createImportantTasks} from "./aggregator.js";
 
 export let clickedProjIndex = null;
 export default function(objClicked) {
@@ -27,11 +27,13 @@ export default function(objClicked) {
             if (projDiv.getAttribute("proj") === projNameConvert) {
                 const clickedProjCard = DOM.projCards[i];
                 clickedProjCard.classList.add("active-proj");
+
                 DOM.activePgTitle.innerText = projName;
                 while (DOM.activePgBody.firstChild) {
                     DOM.activePgBody.firstChild.remove();
                 }
-                projsAndTasks[projName].forEach(i => createTask(i));
+                (projName === "Important") ? createImportantTasks()
+                : projsAndTasks[projName].forEach(i => createTask(i));
             }
         }
     }
@@ -67,15 +69,8 @@ export default function(objClicked) {
 
                 function checkIfTaskIsImp(currItem) {
                     if (currItem.important) {
-                        const tasksProjName = currItem.taskProj;
-                        const taskTitle = currItem.task;
-                        projsAndTasks.Important.forEach(delTaskFromImpProj);
-                        function delTaskFromImpProj(currItem, currItemInd) {
-                            if (currItem.taskProj === tasksProjName && currItem.task === taskTitle) {
-                                projsAndTasks.Important.splice(currItemInd, 1);
-                                document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
-                            }
-                        }
+                        --projsAndTasks.Important;
+                        document.querySelector(".important-task-amt").innerText = projsAndTasks.Important;
                     }
                 }
             }

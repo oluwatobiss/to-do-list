@@ -1,6 +1,6 @@
 import {
-    DOM, projsAndTasks, createTask, clickedTaskIndex, isToday, isTomorrow, 
-    isThisWeek, startOfWeek, addDays, isSameWeek, parseISO
+    DOM, projsAndTasks, createTask, createImportantTasks, clickedTaskIndex,
+    isToday, isTomorrow, isThisWeek, startOfWeek, addDays, isSameWeek, parseISO
 } from "./aggregator.js";
 
 export default function() {
@@ -27,8 +27,8 @@ export default function() {
                     projsAndTasks[prop].push(taskInfo);
 
                     if (taskInfo.important) {
-                        projsAndTasks.Important.push(taskInfo);
-                        document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
+                        ++projsAndTasks.Important;
+                        document.querySelector(".important-task-amt").innerText = projsAndTasks.Important;
                     }
                     
                     document.querySelector(`.${projNameConvert}-task-amt`).innerText = projsAndTasks[prop].length;
@@ -67,14 +67,14 @@ export default function() {
                     };
 
                     if (clickedTaskImportance === "true" && taskInfo.important === true) {
-                        projsAndTasks.Important.forEach(updateTask);
                         projsAndTasks[clickedTaskProjName].forEach(updateTask);
                     } else if (clickedTaskImportance === "true" && taskInfo.important === false) {
-                        projsAndTasks.Important.forEach(delTaskFromImpProj);
+                        --projsAndTasks.Important;
+                        document.querySelector(".important-task-amt").innerText = projsAndTasks.Important;
                         projsAndTasks[clickedTaskProjName].forEach(updateTask);
                     } else if (clickedTaskImportance === "false" && taskInfo.important === true) {
-                        projsAndTasks.Important.push(taskInfo);
-                        document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
+                        ++projsAndTasks.Important;
+                        document.querySelector(".important-task-amt").innerText = projsAndTasks.Important;
                         projsAndTasks[clickedTaskProjName].forEach(updateTask);
                     } else if (clickedTaskImportance === "false" && taskInfo.important === false) {
                         projsAndTasks[clickedTaskProjName].forEach(updateTask);
@@ -90,14 +90,6 @@ export default function() {
                             currItem.important = taskInfo.important;
                         }
                     }
-
-                    function delTaskFromImpProj(currItem, currItemInd) {
-                        if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
-                            projsAndTasks.Important.splice(currItemInd, 1);
-                            document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
-                        }
-                    }
-
                     // If the clicked task's project name is different from the selected project
                     if (clickedTaskProjName !== DOM.projDropDown.value) {
                         // Move updated task to the selected project
@@ -151,6 +143,8 @@ export default function() {
                                 }
                             }
                         }
+                    } else if (DOM.activePgTitle.innerText === "Important") {
+                        createImportantTasks();
                     } else {
                         projsAndTasks[DOM.activePgTitle.innerText].forEach(i => createTask(i));
                     }

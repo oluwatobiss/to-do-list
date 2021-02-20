@@ -43,12 +43,21 @@ export default function(event) {
                 const projNameSpan = shared.createElement("span", [val], {class: "proj-name"});
 
                 let taskAmtSpan = null;
+                // If val exist in projsAndTasks, just initilize taskAmtSpan. Otherwise,
+                // first assign a val property to projsAndTasks; then, initilize taskAmtSpan.
                 if (projsAndTasks[val]) {
-                    taskAmtSpan = shared.createElement("span", [projsAndTasks[val].length]);
+                    (val === "Important") ?
+                        taskAmtSpan = shared.createElement("span", [projsAndTasks[val]])
+                    :   taskAmtSpan = shared.createElement("span", [projsAndTasks[val].length]);
                 } else {
-                    Object.assign(projsAndTasks, {[val]: []});
+                    if (val === "Important") {
+                        Object.assign(projsAndTasks, {[val]: 0});
+                        taskAmtSpan = shared.createElement("span", [projsAndTasks[val]]);
+                    } else {
+                        Object.assign(projsAndTasks, {[val]: []});
+                        taskAmtSpan = shared.createElement("span", [projsAndTasks[val].length]);
+                    }
                     localStorage.setItem("myPlans", JSON.stringify(projsAndTasks));
-                    taskAmtSpan = shared.createElement("span", [projsAndTasks[val].length]);
                 }
                 taskAmtSpan.classList.add("task-amt", `${projNameConvert}-task-amt`);
 

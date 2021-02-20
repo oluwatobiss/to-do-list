@@ -1,5 +1,6 @@
 import {
-    DOM, projsAndTasks, createTask, isToday, isTomorrow, isThisWeek, startOfWeek, addDays, isSameWeek, parseISO
+    DOM, projsAndTasks, createTask, createImportantTasks, 
+    isToday, isTomorrow, isThisWeek, startOfWeek, addDays, isSameWeek, parseISO
 } from "./aggregator.js";
 
 export let clickedTaskIndex = null;
@@ -67,11 +68,12 @@ export default function(objClicked) {
         starIcon.classList.toggle("important-task");
         if (DOM.activePgTitle.innerText === "Important") {
             projsAndTasks[clickedTaskProjName].forEach(changeImpToFalse);
-            projsAndTasks.Important.forEach(delTaskFromImpProj);
-            while (DOM.activePgBody.firstChild) {
-                DOM.activePgBody.firstChild.remove();
-            }
-            projsAndTasks.Important.forEach(i => createTask(i));
+            --projsAndTasks.Important;
+            document.querySelector(".important-task-amt").innerText = projsAndTasks.Important;
+
+            while (DOM.activePgBody.firstChild) {DOM.activePgBody.firstChild.remove();}
+            createImportantTasks();
+
             function changeImpToFalse(currItem, currItemInd) {
                 if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
                     projsAndTasks[clickedTaskProjName][currItemInd].important = false;
@@ -94,12 +96,13 @@ export default function(objClicked) {
                         if (currItem.important) {
                             currItem.important = false;
                             clickedTaskCard.querySelector(".important-btn").setAttribute("important", false);
-                            projsAndTasks.Important.forEach(delTaskFromImpProj);
+                            --projsAndTasks.Important;
+                            document.querySelector(".important-task-amt").innerText = projsAndTasks.Important;
                         } else {
                             currItem.important = true;
                             clickedTaskCard.querySelector(".important-btn").setAttribute("important", true);
-                            projsAndTasks.Important.push(projsAndTasks[clickedTaskProjName][currItemInd]);
-                            document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
+                            ++projsAndTasks.Important;
+                            document.querySelector(".important-task-amt").innerText = projsAndTasks.Important;
                         }
                     }
                 }
@@ -107,20 +110,14 @@ export default function(objClicked) {
                 if (projsAndTasks[clickedTaskProjName][clickedTaskIndex].important) {
                     projsAndTasks[clickedTaskProjName][clickedTaskIndex].important = false;
                     clickedTaskCard.querySelector(".important-btn").setAttribute("important", false);
-                    projsAndTasks.Important.forEach(delTaskFromImpProj);
+                    --projsAndTasks.Important;
+                    document.querySelector(".important-task-amt").innerText = projsAndTasks.Important;
                 } else {
                     projsAndTasks[clickedTaskProjName][clickedTaskIndex].important = true;
                     clickedTaskCard.querySelector(".important-btn").setAttribute("important", true);
-                    projsAndTasks.Important.push(projsAndTasks[clickedTaskProjName][clickedTaskIndex]);
-                    document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
+                    ++projsAndTasks.Important;
+                    document.querySelector(".important-task-amt").innerText = projsAndTasks.Important;
                 }
-            }
-        }
-
-        function delTaskFromImpProj(currItem, currItemInd) {
-            if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
-                projsAndTasks.Important.splice(currItemInd, 1);
-                document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
             }
         }
         localStorage.setItem("myPlans", JSON.stringify(projsAndTasks));
@@ -137,6 +134,7 @@ export default function(objClicked) {
         DOM.addTaskBtn.innerText = "Update Task";
 
         if (
+            DOM.activePgTitle.innerText === "Important" ||
             DOM.activePgTitle.innerText === "Today" ||
             DOM.activePgTitle.innerText === "Tomorrow" ||
             DOM.activePgTitle.innerText === "This Week" ||
@@ -154,10 +152,11 @@ export default function(objClicked) {
             }
         } else {
             // Prefill Modal Box
-            DOM.modalBoxTaskTitle.value = projsAndTasks[DOM.activePgTitle.innerText][clickedTaskIndex].task;
-            DOM.modalBoxTaskNote.value = projsAndTasks[DOM.activePgTitle.innerText][clickedTaskIndex].note;
-            DOM.modalBoxTaskDate.value = projsAndTasks[DOM.activePgTitle.innerText][clickedTaskIndex].dueDate;
-            DOM.modalBoxTaskImportance.checked = projsAndTasks[DOM.activePgTitle.innerText][clickedTaskIndex].important;
+            const clickedTaskObj = projsAndTasks[DOM.activePgTitle.innerText][clickedTaskIndex];
+            DOM.modalBoxTaskTitle.value = clickedTaskObj.task;
+            DOM.modalBoxTaskNote.value = clickedTaskObj.note;
+            DOM.modalBoxTaskDate.value = clickedTaskObj.dueDate;
+            DOM.modalBoxTaskImportance.checked = clickedTaskObj.important;
         }
         // Pre-choose the project to which the updated task should be added
         if (projOptsArr.some(i => i.value === clickedTaskProjName)) {
@@ -188,22 +187,24 @@ export default function(objClicked) {
                     if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
                         projsAndTasks[clickedTaskProjName].splice(i, 1);
                         if (currItem.important) {
-                            projsAndTasks.Important.forEach(delTaskFromImpProj);
+                            delTaskFromImpProj();
                         }
                     }
                 }
             } else {
-                // Delete the clicked task from the projsAndTasks object
+                // If the clicked task is important, delete it from the important projects
                 if (projsAndTasks[clickedTaskProjName][clickedTaskIndex].important) {
-                    projsAndTasks.Important.forEach(delTaskFromImpProj);
+                    delTaskFromImpProj();
                 }
+                // Delete the clicked task from the projsAndTasks object
                 projsAndTasks[clickedTaskProjName].splice(clickedTaskIndex, 1);
             }
         }
 
         if (DOM.activePgTitle.innerText === "Important") {
+            // Delete task from the important projects
+            delTaskFromImpProj();
             // Find the clicked task in the projsAndTasks object and delete it
-            projsAndTasks.Important.forEach(delTaskFromImpProj);
             for (let i = 0; i < projsAndTasks[clickedTaskProjName].length; i++) {
                 const currItem = projsAndTasks[clickedTaskProjName][i];
                 if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
@@ -214,17 +215,12 @@ export default function(objClicked) {
 
         // Update the localStorage
         localStorage.setItem("myPlans", JSON.stringify(projsAndTasks));
-
         // Update the displayed number of tasks in the deleted task's project
         document.querySelector(`.${clickedTaskProjNameConvert}-task-amt`).innerText = projsAndTasks[clickedTaskProjName].length;
-
         // Update the content displayed onscreen
-        while (DOM.activePgBody.firstChild) {
-            DOM.activePgBody.firstChild.remove();
-        }
-        
+        while (DOM.activePgBody.firstChild) {DOM.activePgBody.firstChild.remove();}
         if (DOM.activePgTitle.innerText === "Important") {
-            projsAndTasks.Important.forEach(i => createTask(i));
+            createImportantTasks();
         } else if (
             DOM.activePgTitle.innerText === "Today" ||
             DOM.activePgTitle.innerText === "Tomorrow" ||
@@ -255,12 +251,10 @@ export default function(objClicked) {
         } else {
             projsAndTasks[clickedTaskProjName].forEach(i => createTask(i));
         }
-            
-        function delTaskFromImpProj(currItem, currItemInd) {
-            if (currItem.taskProj === clickedTaskProjName && currItem.task === clickedTaskTitle) {
-                projsAndTasks.Important.splice(currItemInd, 1);
-                document.querySelector(".important-task-amt").innerText = projsAndTasks.Important.length;
-            }
+
+        function delTaskFromImpProj() {
+            --projsAndTasks.Important;
+            document.querySelector(".important-task-amt").innerText = projsAndTasks.Important;
         }
     }
 

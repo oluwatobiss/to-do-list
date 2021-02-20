@@ -9,6 +9,6 @@ export default function() {
     DOM.navLinks.forEach(i => i.addEventListener("click", displayNavTasks));
     DOM.asideEleNode.addEventListener("click", actOnClickedProjEle);
     DOM.createProjBtn.addEventListener("click", addProjName);
-    DOM.addTaskBtn.addEventListener("click", addTask);
     DOM.mainEleNode.addEventListener("click", actOnClickedTaskEle);
+    DOM.addTaskBtn.addEventListener("click", addTask);
 };
