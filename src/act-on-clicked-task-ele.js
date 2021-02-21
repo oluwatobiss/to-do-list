@@ -13,7 +13,7 @@ export default function(objClicked) {
     const trashTaskBtn = objClicked.target.closest(".trash-task-btn");
 
     if (addNewTaskBtn) {
-        const projOptsArr = Array.from(DOM.projDropDown.children);
+        const projOptsArr = [...DOM.projDropDown.children];
         DOM.taskModalHeader.innerText = "New Task";
         DOM.addTaskBtn.innerText = "Add Task";
         // Pre-choose the project to which the new task should be added
@@ -125,7 +125,7 @@ export default function(objClicked) {
 
     if (editTaskBtn) {
         getClickedTaskIndex(editTaskBtn.closest("button"));
-        const projOptsArr = Array.from(DOM.projDropDown.children);
+        const projOptsArr = [...DOM.projDropDown.children];
         const clickedTaskCard = DOM.taskCards[clickedTaskIndex];
         const clickedTaskTitle = clickedTaskCard.querySelector(".task").innerText;
         const clickedTaskProjName = clickedTaskCard.querySelector(".task-proj").getAttribute("taskproj");
