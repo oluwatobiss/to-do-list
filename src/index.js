@@ -7,7 +7,7 @@ const DOM = (() => {
     contentDiv.append(header, aside, mainEle, newProjModal, newTaskModal);
 
     const logo = document.getElementById("logo");
-    const navLinks = Array.from(document.querySelector("#nav-links").children);
+    const navLinks = [...document.querySelector("#nav-links").children];
     const asideEleNode = document.getElementById("aside-ele");
     const projListDiv = document.getElementById("proj-list");
     const projCards = projListDiv.children;
