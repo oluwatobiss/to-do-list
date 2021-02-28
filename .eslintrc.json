@@ -1,0 +1,19 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": ["airbnb-base", "prettier"],
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    "import/no-cycle": "off",
+    "no-inner-declarations": "off",
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+    "no-unused-expressions": ["error", { "allowTernary": true }],
+    "no-use-before-define": ["error", { "functions": false }],
+    "no-param-reassign": ["error", { "props": false }]
+  }
+}

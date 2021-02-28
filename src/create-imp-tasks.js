@@ -1,14 +1,15 @@
-import {projsAndTasks, createTask} from "./aggregator.js";
+import { projsAndTasks, createTask } from "./aggregator";
 
-export default function() {
-    for (const prop in projsAndTasks) {
-        if (prop !== "Important") {
-            projsAndTasks[prop].forEach(createTaskBasedOnImportancy);
-            function createTaskBasedOnImportancy(currItem) {
-                if (currItem.important) {
-                    createTask(currItem);
-                }
-            }
+export default () => {
+  const keysInProjsAndTasks = Object.keys(projsAndTasks);
+  keysInProjsAndTasks.forEach((i) => {
+    if (i !== "Important") {
+      projsAndTasks[i].forEach(createTaskBasedOnImportancy);
+      function createTaskBasedOnImportancy(currItem) {
+        if (currItem.important) {
+          createTask(currItem);
         }
-    }   
-}
+      }
+    }
+  });
+};
