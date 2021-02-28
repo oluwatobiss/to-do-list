@@ -88,11 +88,14 @@ const newTaskModal = (() => {
     class: "modal-btns-div",
   });
 
-  const newProjFormEle = shared.createElement(
-    "form",
-    [taskDiv, noteDiv, dueDateDiv, importanceDiv, addToProjDiv, modalBtnDiv],
-    { id: "new-proj-form" }
-  );
+  const newProjFormEle = shared.createElement("form", [
+    taskDiv,
+    noteDiv,
+    dueDateDiv,
+    importanceDiv,
+    addToProjDiv,
+    modalBtnDiv,
+  ]);
 
   const modalBoxBodyDiv = shared.createElement("div", [newProjFormEle], {
     class: "modal-box-body",

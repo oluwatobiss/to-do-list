@@ -38,11 +38,11 @@ const newProjModal = (() => {
     type: "text",
     id: "proj-title",
   });
-  const newProjFormEle = shared.createElement(
-    "form",
-    [formLabelEle, formInputEle, modalBtnDiv],
-    { id: "new-proj-form" }
-  );
+  const newProjFormEle = shared.createElement("form", [
+    formLabelEle,
+    formInputEle,
+    modalBtnDiv,
+  ]);
 
   const modalBoxBodyDiv = shared.createElement("div", [newProjFormEle], {
     class: "modal-box-body",
